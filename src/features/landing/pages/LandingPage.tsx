@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/app/router/routes'
-import { Button } from '@/shared/components/ui/Button'
+import { Button } from '@/components/ui/Button'
 
 export function LandingPage() {
     const navigate = useNavigate()
@@ -21,7 +21,7 @@ export function LandingPage() {
 
                 <h1 className="text-5xl font-bold text-text leading-tight mb-4">
                     Bienvenido a{' '}
-                    <span className="text-accent">MyApp</span>
+                    <span className="text-accent">Planoria</span>
                 </h1>
 
                 <p className="text-lg text-muted mb-10 leading-relaxed">

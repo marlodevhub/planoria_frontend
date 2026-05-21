@@ -4,12 +4,12 @@ import { authService } from '../api/authService'
 import { useAuthStore } from '../store/authStore'
 import { ROUTES } from '@/app/router/routes'
 
-export function useLogin() {
+export function useRegister() {
     const navigate = useNavigate()
     const setAuth = useAuthStore((s) => s.setAuth)
 
     return useMutation({
-        mutationFn: authService.login,
+        mutationFn: authService.register,
         onSuccess: ({ user, token }) => {
             setAuth(user, token)
             navigate(ROUTES.WORKSPACE)
