@@ -47,11 +47,11 @@ export function WorkspaceLayout() {
         return (
             <div className="min-h-screen bg-bg flex flex-col">
                 {/* Header móvil */}
-                <header className="flex items-center px-4 h-14 bg-surface border-b border-border flex-shrink-0">
+                <header className="flex items-center px-4 h-14 bg-bg  flex-shrink-0">
                     <div className="h-7 w-7 rounded-lg bg-accent flex items-center justify-center">
-                        <span className="text-white font-black text-xs">M</span>
+                        <span className="text-white font-black text-xs">P</span>
                     </div>
-                    <span className="font-bold text-text text-sm ml-2">MyApp</span>
+                    <span className="font-bold text-text text-sm ml-2">Planoria</span>
                 </header>
 
                 {/* Contenido */}
@@ -69,7 +69,7 @@ export function WorkspaceLayout() {
         return (
             <div className="min-h-screen bg-bg flex flex-col">
                 {/* Header tablet */}
-                <header className="flex items-center gap-3 px-4 h-14 bg-surface border-b border-border flex-shrink-0">
+                <header className="flex items-center gap-3 px-4 h-14 bg-bg flex-shrink-0">
                     <button
                         id="tablet-menu-btn"
                         onClick={() => setTabletOpen((o) => !o)}
@@ -78,9 +78,9 @@ export function WorkspaceLayout() {
                         <i className="ti ti-menu-2 text-[20px]" aria-hidden="true" />
                     </button>
                     <div className="h-7 w-7 rounded-lg bg-accent flex items-center justify-center">
-                        <span className="text-white font-black text-xs">M</span>
+                        <span className="text-white font-black text-xs">P</span>
                     </div>
-                    <span className="font-bold text-text text-sm">MyApp</span>
+                    <span className="font-bold text-text text-sm">Planoria</span>
                 </header>
 
                 {/* Sidebar flotante tablet */}
@@ -88,10 +88,10 @@ export function WorkspaceLayout() {
                     <div className="fixed inset-0 z-40 flex" style={{ top: '56px' }}>
                         <div id="tablet-sidebar" className="m-3">
                             <Sidebar
+                                variant="tablet"
                                 collapsed={false}
                                 onToggle={() => setTabletOpen(false)}
                                 onNavClick={() => setTabletOpen(false)}
-                                floating
                             />
                         </div>
                     </div>
@@ -109,13 +109,14 @@ export function WorkspaceLayout() {
     return (
         <div className="flex h-screen bg-bg overflow-hidden">
             <Sidebar
+                variant="desktop"
                 collapsed={collapsed}
                 onToggle={() => setCollapsed((c) => !c)}
             />
 
             <div className="flex flex-col flex-1 min-w-0">
                 {/* Header desktop */}
-                <header className="flex items-center gap-4 px-6 h-16 border-b border-border bg-surface flex-shrink-0">
+                <header className="flex items-center gap-4 px-6 h-16 bg-bg flex-shrink-0">
                     <div className="flex-1" />
                     <div className="flex items-center gap-2 text-muted text-xs font-mono">
                         <i className="ti ti-bell text-[18px]" aria-hidden="true" />

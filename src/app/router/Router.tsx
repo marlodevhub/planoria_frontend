@@ -9,7 +9,8 @@ import { LandingPage } from '@/features/landing/pages/LandingPage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
 import { WorkspacePage } from '@/features/workspace/pages/WorkspacePage'
-import { FlashcardsPage } from '@/features/workspace/pages/FlashcardsPage'
+import { FlashcardsPage } from '@/features/flashcards/pages/FlashcardsPage'
+import { StudyPage } from '@/features/flashcards/pages/StudyPage'
 import { QuizzesPage } from '@/features/workspace/pages/QuizzesPage'
 import { CronogramaPage } from '@/features/workspace/pages/CronogramaPage'
 import { ProgresosPage } from '@/features/workspace/pages/ProgresosPage'
@@ -34,6 +35,7 @@ export function AppRouter() {
                     <Route element={<WorkspaceLayout />}>
                         <Route path={ROUTES.WORKSPACE} element={<WorkspacePage />} />
                         <Route path={ROUTES.FLASHCARDS} element={<FlashcardsPage />} />
+                        <Route path={ROUTES.FLASHCARDS_STUDY} element={<StudyPage />} />
                         <Route path={ROUTES.QUIZZES} element={<QuizzesPage />} />
                         <Route path={ROUTES.CRONOGRAMA} element={<CronogramaPage />} />
                         <Route path={ROUTES.PROGRESO} element={<ProgresosPage />} />

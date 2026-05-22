@@ -37,6 +37,15 @@ export default {
           '0%, 100%': { boxShadow: '0 0 20px rgba(99,102,241,0.3)' },
           '50%':      { boxShadow: '0 0 40px rgba(99,102,241,0.6)' },
         },
+
+        'swipe-up': {
+          '0%':   { opacity: '1', transform: 'translateY(0) rotate(0deg)' },
+          '100%': { opacity: '0', transform: 'translateY(-80px) rotate(-5deg)' },
+        },
+        'swipe-down': {
+          '0%':   { opacity: '1', transform: 'translateY(0) rotate(0deg)' },
+          '100%': { opacity: '0', transform: 'translateY(80px) rotate(5deg)' },
+        },
       },
       animation: {
         'fade-up':    'fade-up 0.6s ease forwards',
@@ -44,6 +53,8 @@ export default {
         'slide-left': 'slide-left 0.5s ease forwards',
         'float':      'float 3s ease-in-out infinite',
         'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+        'swipe-up':   'swipe-up 0.38s ease forwards',
+        'swipe-down': 'swipe-down 0.38s ease forwards',
       },
     },
   },

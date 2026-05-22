@@ -4,6 +4,7 @@ export const ROUTES = {
     REGISTER: '/register',
     WORKSPACE: '/workspace',
     FLASHCARDS: '/workspace/flashcards',
+    FLASHCARDS_STUDY: '/workspace/flashcards/:deckId/study',
     QUIZZES: '/workspace/quizzes',
     CRONOGRAMA: '/workspace/cronograma',
     PROGRESO: '/workspace/progreso',
