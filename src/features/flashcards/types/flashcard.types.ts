@@ -1,3 +1,4 @@
+// ─── Formulario UI ────────────────────────────────────────
 export type DeckMethod = 'tema' | 'archivo' | 'manual'
 export type Difficulty = 'easy' | 'med' | 'hard'
 
@@ -9,6 +10,7 @@ export interface ManualCard {
 
 export interface CreateDeckForm {
     courseName: string
+    title: string
     method: DeckMethod
     difficulty: Difficulty | null
     topic: string
@@ -17,17 +19,19 @@ export interface CreateDeckForm {
     manualCards: ManualCard[]
 }
 
+// ─── GET /archivo ─────────────────────────────────────────
 export interface Deck {
-    id: string
-    courseName: string
-    cardCount: number
-    method: DeckMethod
-    difficulty: Difficulty | null
-    retention: number
-    cards: ManualCard[]
+    idArchivo: number
+    idUsuario: number
+    nombreArchivo: string
+    urlArchivo: string
+    tipoArchivo: string
+    tamanoMB: number
+    fechaSubida: string
+    estado: string
 }
 
-
+// ─── Sesión de estudio UI ─────────────────────────────────
 export interface Card {
     id: string
     question: string

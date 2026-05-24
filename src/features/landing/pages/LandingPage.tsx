@@ -14,9 +14,10 @@ export function LandingPage() {
             </div>
 
             <div className="relative z-10 text-center max-w-2xl px-6 animate-fade-up">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-surface text-muted text-xs font-mono mb-8">
-                    <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
-                    v1.0.0 — ready
+                <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface text-muted text-xs font-mono mb-8">
+                    <div className="h-16 w-16 rounded-lg bg-accent flex items-center justify-center flex-shrink-0">
+                        <span className="text-white font-black text-3xl">P</span>
+                    </div>
                 </div>
 
                 <h1 className="text-5xl font-bold text-text leading-tight mb-4">
@@ -25,7 +26,7 @@ export function LandingPage() {
                 </h1>
 
                 <p className="text-lg text-muted mb-10 leading-relaxed">
-                    Plataforma limpia, escalable y lista para crecer contigo.
+                    Estudia con enfoque, sin distracciones y convierte tu esfuerzo en resultados.
                 </p>
 
                 <div className="flex items-center justify-center gap-4">

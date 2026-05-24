@@ -8,14 +8,14 @@ import { AdminLayout } from '@/components/layout/AdminLayout'
 import { LandingPage } from '@/features/landing/pages/LandingPage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
-import { WorkspacePage } from '@/features/workspace/pages/WorkspacePage'
+
+import { DashboardPage } from '@/features/dashboard/components/DashboardPage'
 import { FlashcardsPage } from '@/features/flashcards/pages/FlashcardsPage'
 import { StudyPage } from '@/features/flashcards/pages/StudyPage'
-import { QuizzesPage } from '@/features/workspace/pages/QuizzesPage'
-import { CronogramaPage } from '@/features/workspace/pages/CronogramaPage'
-import { ProgresosPage } from '@/features/workspace/pages/ProgresosPage'
-import { CursosPage } from '@/features/workspace/pages/CursosPage'
-import { AdminPage } from '@/features/admin/pages/AdminPage'
+import { QuizzesPage } from '@/features/quizzes/pages/QuizzesPage'
+import { CronogramaPage } from '@/features/cronograma/pages/CronogramaPage'
+import { ProgresosPage } from '@/features/progresos/pages/ProgresosPage'
+import { CursosPage } from '@/features/cursos/pages/CursosPage'
 
 export function AppRouter() {
     return (
@@ -33,22 +33,13 @@ export function AppRouter() {
                 {/* Workspace — rutas anidadas */}
                 <Route element={<ProtectedRoute />}>
                     <Route element={<WorkspaceLayout />}>
-                        <Route path={ROUTES.WORKSPACE} element={<WorkspacePage />} />
+                        <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
                         <Route path={ROUTES.FLASHCARDS} element={<FlashcardsPage />} />
                         <Route path={ROUTES.FLASHCARDS_STUDY} element={<StudyPage />} />
                         <Route path={ROUTES.QUIZZES} element={<QuizzesPage />} />
                         <Route path={ROUTES.CRONOGRAMA} element={<CronogramaPage />} />
                         <Route path={ROUTES.PROGRESO} element={<ProgresosPage />} />
                         <Route path={ROUTES.CURSOS} element={<CursosPage />} />
-                    </Route>
-                </Route>
-
-                {/* Admin */}
-                <Route element={<ProtectedRoute />}>
-                    <Route element={<RoleGuard allowedRoles={['admin']} />}>
-                        <Route element={<AdminLayout />}>
-                            <Route path={ROUTES.ADMIN} element={<AdminPage />} />
-                        </Route>
                     </Route>
                 </Route>
 

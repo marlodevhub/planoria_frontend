@@ -13,6 +13,7 @@ const makeCard = (): ManualCard => ({
 
 const defaultForm = (): CreateDeckForm => ({
     courseName: '',
+    title: '',
     method: 'manual',
     difficulty: null,
     topic: '',
@@ -24,12 +25,13 @@ const defaultForm = (): CreateDeckForm => ({
 interface CreateDeckModalProps {
     onClose: () => void
     onSubmit: (form: CreateDeckForm) => void
+    isLoading?: boolean  // ← nuevo
 }
 
 const inputCls = 'w-full bg-bg border border-border rounded-xl px-4 py-2.5 text-text text-sm placeholder:text-muted focus:outline-none focus:border-accent/60 transition-colors'
-const sectionCls = 'bg-bg/50 border border-border rounded-xl p-4 space-y-4'
+const sectionCls = 'bg-surface border border-border rounded-xl p-4 space-y-4'
 
-export function CreateDeckModal({ onClose, onSubmit }: CreateDeckModalProps) {
+export function CreateDeckModal({ onClose, onSubmit, isLoading }: CreateDeckModalProps) {
     const [form, setForm] = useState<CreateDeckForm>(defaultForm)
     const fileRef = useRef<HTMLInputElement>(null)
 
@@ -43,6 +45,7 @@ export function CreateDeckModal({ onClose, onSubmit }: CreateDeckModalProps) {
 
     const updateCard = (id: string, field: 'question' | 'answer', value: string) =>
         set('manualCards', form.manualCards.map((c) => c.id === id ? { ...c, [field]: value } : c))
+
 
     return (
         <div
@@ -122,26 +125,26 @@ export function CreateDeckModal({ onClose, onSubmit }: CreateDeckModalProps) {
 
                     {/* Por archivo */}
                     {form.method === 'archivo' && (
-                        <div className={sectionCls}>
+                        <div className={sectionCls} >
                             <button
                                 type="button"
                                 onClick={() => fileRef.current?.click()}
-                                className="w-full border border-dashed border-border rounded-xl py-6 flex flex-col items-center gap-2 text-muted hover:border-accent/50 hover:text-text transition-colors"
+                                className="w-full  border border-dashed border-border rounded-xl py-6 flex flex-col items-center gap-2 text-muted hover:border-accent/50 hover:text-text transition-colors"
                             >
                                 <i className="ti ti-cloud-upload text-[28px]" aria-hidden="true" />
                                 <p className="text-sm">
                                     {form.file ? form.file.name : 'Arrastra o haz clic para subir'}
                                 </p>
-                                <span className="text-xs">PDF, DOCX, TXT — máx. 10 MB</span>
+                                <span className="text-xs">PDF, TXT — máx. 5 MB</span>
                             </button>
                             <input
                                 ref={fileRef}
                                 type="file"
                                 accept=".pdf,.docx,.txt"
-                                className="hidden"
+                                className="hidden "
                                 onChange={(e) => set('file', e.target.files?.[0] ?? null)}
                             />
-                            <div className="space-y-1.5">
+                            <div className="space-y-1.5 ">
                                 <label className="text-xs font-medium text-muted">Dificultad</label>
                                 <DifficultySelector
                                     value={form.difficulty}
@@ -180,7 +183,7 @@ export function CreateDeckModal({ onClose, onSubmit }: CreateDeckModalProps) {
                                 <button
                                     type="button"
                                     onClick={addCard}
-                                    className="flex items-center gap-2 text-sm text-muted hover:text-text border border-dashed border-border hover:border-border rounded-lg px-3 py-2 transition-colors"
+                                    className="flex items-center gap-2 text-sm text-muted hover:text-text rounded-lg px-3 py-2 transition-colors"
                                 >
                                     <i className="ti ti-plus text-[15px]" aria-hidden="true" />
                                     Agregar tarjeta
@@ -194,20 +197,21 @@ export function CreateDeckModal({ onClose, onSubmit }: CreateDeckModalProps) {
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border flex-shrink-0">
+                <div className="flex items-center justify-end gap-3 px-6 py-4  flex-shrink-0">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="px-4 py-2 text-sm text-muted hover:text-text border border-border rounded-xl hover:bg-white/5 transition-colors"
+                        className="px-4 py-2 text-sm text-muted hover:text-text  rounded-xl hover:bg-white/5 transition-colors"
                     >
                         Cancelar
                     </button>
                     <button
                         type="button"
                         onClick={() => onSubmit(form)}
-                        className="px-5 py-2 text-sm font-medium bg-accent hover:bg-accent/90 text-white rounded-xl transition-colors shadow-lg shadow-accent/20"
+                        disabled={isLoading}
+                        className="px-5 py-2 text-sm font-medium bg-accent hover:bg-accent/90 text-white rounded-xl transition-colors shadow-lg shadow-accent/20 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Crear mazo
+                        {isLoading ? 'Procesando con IA...' : 'Crear mazo'}
                     </button>
                 </div>
             </div>

@@ -47,11 +47,11 @@ export function WorkspaceLayout() {
         return (
             <div className="min-h-screen bg-bg flex flex-col">
                 {/* Header móvil */}
-                <header className="flex items-center px-4 h-14 bg-bg  flex-shrink-0">
+                <header className="flex items-center px-4 h-14  flex-shrink-0">
                     <div className="h-7 w-7 rounded-lg bg-accent flex items-center justify-center">
                         <span className="text-white font-black text-xs">P</span>
                     </div>
-                    <span className="font-bold text-text text-sm ml-2">Planoria</span>
+                    <span className="font-bold text-accent text-sm ml-2">Planoria</span>
                 </header>
 
                 {/* Contenido */}
@@ -67,9 +67,9 @@ export function WorkspaceLayout() {
 
     if (screen === 'tablet') {
         return (
-            <div className="min-h-screen bg-bg flex flex-col">
+            <div className="min-h-screen bg-gradient-to-tr from-gradient-1 via-gradient-2 to-gradient-3 flex flex-col">
                 {/* Header tablet */}
-                <header className="flex items-center gap-3 px-4 h-14 bg-bg flex-shrink-0">
+                <header className="flex items-center gap-3 px-4 h-14 flex-shrink-0">
                     <button
                         id="tablet-menu-btn"
                         onClick={() => setTabletOpen((o) => !o)}
@@ -80,7 +80,7 @@ export function WorkspaceLayout() {
                     <div className="h-7 w-7 rounded-lg bg-accent flex items-center justify-center">
                         <span className="text-white font-black text-xs">P</span>
                     </div>
-                    <span className="font-bold text-text text-sm">Planoria</span>
+                    <span className="font-bold text-accent text-sm">Planoria</span>
                 </header>
 
                 {/* Sidebar flotante tablet */}
@@ -107,7 +107,7 @@ export function WorkspaceLayout() {
 
     // Desktop
     return (
-        <div className="flex h-screen bg-bg overflow-hidden">
+        <div className="flex h-screen  bg-gradient-to-tr from-gradient-1 via-gradient-2 to-gradient-3 overflow-hidden">
             <Sidebar
                 variant="desktop"
                 collapsed={collapsed}
@@ -116,7 +116,7 @@ export function WorkspaceLayout() {
 
             <div className="flex flex-col flex-1 min-w-0">
                 {/* Header desktop */}
-                <header className="flex items-center gap-4 px-6 h-16 bg-bg flex-shrink-0">
+                <header className="flex items-center gap-4 px-6 h-16 flex-shrink-0">
                     <div className="flex-1" />
                     <div className="flex items-center gap-2 text-muted text-xs font-mono">
                         <i className="ti ti-bell text-[18px]" aria-hidden="true" />

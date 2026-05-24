@@ -1,6 +1,8 @@
 import { cn } from '@/lib/utils'
 import type { DeckMethod } from '../../types/flashcard.types'
 
+// Selector para elegir el método de creación del mazo.
+
 const methods: { key: DeckMethod; icon: string; label: string }[] = [
     { key: 'tema', icon: 'ti-bulb', label: 'Por tema' },
     { key: 'archivo', icon: 'ti-file-upload', label: 'Por archivo' },

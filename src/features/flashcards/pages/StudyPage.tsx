@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/app/router/routes'
-import { fetchCardsByDeck } from '../services/flashcards.service'
-import { useStudySession } from '../hooks/useStudySession'
-import { StudyCard } from '../components/study/StudyCard'
-import { StudyResult } from '../components/study/StudyResult'
+import { flashcardService } from '../services/flashcards.service'
+import { useStudySession } from '../hooks/study/useStudySession'
+import { StudyCard } from '../components/Card/StudyCard'
+import { StudyResult } from '../components/Card/StudyResult'
 import type { Card } from '../types/flashcard.types'
 
 export function StudyPage() {
@@ -15,7 +15,7 @@ export function StudyPage() {
     const { current, idx, flipped, known, unknown, done, progress, flip, resetFlip, advance, reset } = useStudySession(cards)
 
     useEffect(() => {
-        if (deckId) fetchCardsByDeck(deckId).then(setCards)
+        if (deckId) flashcardService.getCardsByDeck(deckId).then(setCards)
     }, [deckId])
 
     if (done) {
@@ -32,7 +32,7 @@ export function StudyPage() {
 
     return (
         <div
-            className="min-h-[80vh] flex flex-col items-center justify-center gap-6 animate-fade-in"
+            className="min-h-[80vh] flex flex-col items-center justify-center gap-6 animate-fade-in "
             style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
         >
             {/* Header */}

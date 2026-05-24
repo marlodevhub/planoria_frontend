@@ -1,6 +1,8 @@
 import { cn } from '@/lib/utils'
 import type { Difficulty } from '../../types/flashcard.types'
 
+// Botones de deficultad
+
 const opts: { key: Difficulty; label: string; cls: string }[] = [
     { key: 'easy', label: 'Fácil', cls: 'border-emerald-500 bg-emerald-500/10 text-emerald-400' },
     { key: 'med', label: 'Media', cls: 'border-yellow-500  bg-yellow-500/10  text-yellow-400' },

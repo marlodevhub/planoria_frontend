@@ -44,7 +44,7 @@ export function Sidebar({
                     </div>
 
                     {!collapsed && (
-                        <span className="font-bold text-text text-sm truncate">
+                        <span className="font-bold text-accent text-sm truncate">
                             Planoria
                         </span>
                     )}
@@ -64,7 +64,7 @@ export function Sidebar({
             </nav>
 
             {/* Footer */}
-            <div className="p-2 border-t border-border space-y-0.5 flex-shrink-0">
+            <div className="p-2  space-y-0.5 flex-shrink-0">
                 {/* User */}
                 <div
                     className={cn(
@@ -73,17 +73,17 @@ export function Sidebar({
                     )}
                 >
                     <div className="h-7 w-7 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold flex-shrink-0">
-                        {user?.name?.[0]?.toUpperCase() ?? 'U'}
+                        {user?.nombre?.[0]?.toUpperCase() ?? 'U'}
                     </div>
 
                     {!collapsed && (
                         <div className="flex-1 min-w-0">
                             <p className="text-text text-xs font-medium truncate">
-                                {user?.name}
+                                {user?.nombre}
                             </p>
 
                             <p className="text-muted text-xs truncate font-mono">
-                                {user?.role}
+                                {user?.rol}
                             </p>
                         </div>
                     )}
@@ -98,14 +98,16 @@ export function Sidebar({
                         collapsed && 'justify-center'
                     )}
                 >
-                    <i
-                        className="ti ti-logout text-[18px]"
-                        aria-hidden="true"
-                    />
+                    <i className="ti ti-logout text-[18px]" />
 
-                    {!collapsed && (
-                        <span className="text-sm">Salir</span>
-                    )}
+                    <span
+                        className={cn(
+                            'text-sm transition-all duration-200',
+                            collapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
+                        )}
+                    >
+                        Salir
+                    </span>
                 </button>
 
                 {/* Toggle — solo desktop */}
@@ -118,21 +120,34 @@ export function Sidebar({
                             collapsed && 'justify-center'
                         )}
                     >
-                        <i
-                            className={cn(
-                                'text-[18px] transition-transform duration-300',
-                                collapsed
-                                    ? 'ti-layout-sidebar-right'
-                                    : 'ti-layout-sidebar'
-                            )}
-                            aria-hidden="true"
-                        />
+                        {/* ICONO */}
+                        <div className="w-[18px] h-[18px] flex items-center justify-center">
+                            <svg
+                                className="transition-all duration-200"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <path
+                                    d={collapsed ? "M9 6l6 6-6 6" : "M15 6l-6 6 6 6"}
+                                />
+                            </svg>
+                        </div>
 
-                        {!collapsed && (
-                            <span className="text-sm">
-                                Colapsar
-                            </span>
-                        )}
+                        {/* TEXTO */}
+                        <span
+                            className={cn(
+                                'text-sm transition-all duration-200',
+                                collapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
+                            )}
+                        >
+                            Colapsar
+                        </span>
                     </button>
                 )}
             </div>
