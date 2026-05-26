@@ -69,16 +69,16 @@ export function RegisterPage() {
 
                     {/* Feature Center (Entrada única y fluida) */}
                     <div className="relative z-10 flex flex-col gap-5 my-auto py-8 max-w-xs mx-auto w-full text-center animate-fade-in [animation-duration:500ms]">
-                        <div className="relative h-20 w-20 mx-auto flex items-center justify-center mb-2 transform-gpu backface-hidden">
+                        {/* <div className="relative h-20 w-20 mx-auto flex items-center justify-center mb-2 transform-gpu backface-hidden">
                             <div className="absolute inset-0 bg-indigo-500/10 blur-xl" />
                             <div className="relative h-16 w-16 bg-bg border border-border/10 rotate-45 transform flex items-center justify-center shadow-md">
                                 <div className="h-6 w-6 bg-surface rotate-[-45deg] flex items-center justify-center text-sm">✨</div>
                             </div>
-                        </div>
+                        </div> */}
                         <h2 className="text-2xl font-bold text-black leading-tight transform-gpu backface-hidden">
-                            Conecta y conversa en<br />
+                            Gestiona tu aprendizaje en<br />
                             <span className=" bg-clip-text bg-gradient-to-r text-accent-2 ">
-                                un entorno mínimo
+                                un entorno limpio y modular
                             </span>
                         </h2>
                         <p className="text-muted text-xs leading-relaxed transform-gpu backface-hidden">
