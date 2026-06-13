@@ -1,15 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ROUTES } from './routes'
-import { ProtectedRoute } from './guards/ProtectedRoute'
-import { RoleGuard } from './guards/RoleGuard'
+import { ProtectedRoute } from '@/features/auth/guards/ProtectedRoute'
 import { PublicLayout } from '@/components/layout/PublicLayout'
 import { WorkspaceLayout } from '@/components/layout/WorkspaceLayout'
-import { AdminLayout } from '@/components/layout/AdminLayout'
 import { LandingPage } from '@/features/landing/pages/LandingPage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
 
-import { DashboardPage } from '@/features/dashboard/components/DashboardPage'
+import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
 import { FlashcardsPage } from '@/features/flashcards/pages/FlashcardsPage'
 import { StudyPage } from '@/features/flashcards/pages/StudyPage'
 import { QuizzesPage } from '@/features/quizzes/pages/QuizzesPage'
@@ -17,6 +15,7 @@ import { CronogramaPage } from '@/features/cronograma/pages/CronogramaPage'
 import { ProgresosPage } from '@/features/progresos/pages/ProgresosPage'
 import { CursosPage } from '@/features/cursos/pages/CursosPage'
 
+// Definición de rutas
 export function AppRouter() {
     return (
         <BrowserRouter>
@@ -24,11 +23,9 @@ export function AppRouter() {
                 {/* Públicas */}
                 <Route element={<PublicLayout />}>
                     <Route path={ROUTES.LANDING} element={<LandingPage />} />
+                    <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+                    <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
                 </Route>
-
-                {/* Auth */}
-                <Route path={ROUTES.LOGIN} element={<LoginPage />} />
-                <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
 
                 {/* Workspace — rutas anidadas */}
                 <Route element={<ProtectedRoute />}>

@@ -1,5 +1,4 @@
 // features/dashboard/components/RecentActivity.tsx
-
 interface ActivityItem {
     id: string
     description: string

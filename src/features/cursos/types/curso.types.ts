@@ -1,4 +1,7 @@
 export interface Curso {
-    id: number
-    nombre: string
+    name: string
+    description: string
+    examDate: string
+    examTime: string
+    colorHex: string
 }

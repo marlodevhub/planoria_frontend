@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useDeckCards } from '../hooks/deck'
 import { ROUTES } from '@/app/router/routes'
-import { flashcardService } from '../services/flashcards.service'
 import { useStudySession } from '../hooks/study/useStudySession'
 import { StudyCard } from '../components/Card/StudyCard'
 import { StudyResult } from '../components/Card/StudyResult'
@@ -10,13 +10,18 @@ import type { Card } from '../types/flashcard.types'
 export function StudyPage() {
     const { deckId } = useParams()
     const navigate = useNavigate()
-    const [cards, setCards] = useState<Card[]>([])
 
+    const cardsQuery = useDeckCards(deckId)
+    const cards = useMemo(() => cardsQuery.data ?? [], [cardsQuery.data])
     const { current, idx, flipped, known, unknown, done, progress, flip, resetFlip, advance, reset } = useStudySession(cards)
 
-    useEffect(() => {
-        if (deckId) flashcardService.getCardsByDeck(deckId).then(setCards)
-    }, [deckId])
+    if (cardsQuery.isLoading) {
+        return <p className="text-muted">Cargando tarjetas...</p>
+    }
+
+    if (cardsQuery.isError) {
+        return <p className="text-red-500">No se pudieron cargar las tarjetas. Intenta de nuevo.</p>
+    }
 
     if (done) {
         return (

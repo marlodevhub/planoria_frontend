@@ -1,37 +1,39 @@
-import axios, { InternalAxiosRequestConfig } from 'axios'
-import { env } from '@/app/config/env'
-import { useAuthStore } from '@/features/auth/store/authStore'
+/**
+ * Axios Instance
+ * Cliente HTTP centralizado con interceptores desacoplados
+ *
+ * Arquitectura:
+ * - Request interceptor: agrega autenticación
+ * - Response interceptor: mapea errores, maneja refresh token
+ */
 
+import axios from 'axios'
+import { env } from '@/app/config/env'
+import { authRequestInterceptor } from '@/lib/authInterceptor'
+import { errorResponseInterceptor } from '@/lib/errorInterceptor'
+
+/**
+ * Crear instancia de Axios con configuración base
+ */
 const api = axios.create({
     baseURL: env.apiUrl,
     timeout: 15000,
     headers: { 'Content-Type': 'application/json' },
 })
 
-// Tipado estricto para evitar anys implícitos
-api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-    const token = useAuthStore.getState().token
-    if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-})
+/**
+ * Interceptor de REQUEST
+ * Responsabilidad: Agregar autenticación (Bearer token)
+ */
+api.interceptors.request.use(authRequestInterceptor)
 
+/**
+ * Interceptor de RESPONSE
+ * Responsabilidad: Mapear errores y manejar refresh token
+ */
 api.interceptors.response.use(
-    (res) => res,
-    (error) => {
-        if (error.response?.status === 401) {
-            const isLoginRequest = error.config?.url?.includes('/auth/login')
-            const isLoginPage = window.location.pathname.includes('/login')
-
-            // Solo deslogueamos y redirigimos si NO estamos intentando loguearnos
-            if (!isLoginRequest && !isLoginPage) {
-                useAuthStore.getState().logout()
-                window.location.href = '/login'
-            }
-        }
-        return Promise.reject(error)
-    }
+    (response) => response,
+    errorResponseInterceptor
 )
 
 export default api

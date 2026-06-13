@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuthStore } from '@/features/auth/store/authStore'
-import { ROUTES } from '../routes'
-import type { User } from '@/shared/types/user.types'  // ← actualizado
+import { ROUTES } from '@/app/router/routes'
+import type { User } from '@/features/auth/types/auth.types'
 
 interface RoleGuardProps {
     allowedRoles: User['rol'][]

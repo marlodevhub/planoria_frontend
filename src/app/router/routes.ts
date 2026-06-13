@@ -10,3 +10,7 @@ export const ROUTES = {
     PROGRESO: '/workspace/progreso',
     CURSOS: '/workspace/cursos',
 } as const
+//constantes de paths
+export const buildRoute = {
+    flashcardsStudy: (deckId: string) => `/workspace/flashcards/${deckId}/study`,
+}

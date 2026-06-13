@@ -1,26 +1,28 @@
 import { useState } from 'react'
-import { useUploadFile } from '../../study/hooks/useUploadFile'
-import { useDecks } from '../hooks/desck/useDecks'
+import { useUploadFile } from '../hooks/upload/useUploadFile'
+import { useDecks } from '../hooks/deck'
 import { DeckCard } from '../components/DeckCard/DeckCard'
 import { CreateDeckModal } from '../components/CreateDeckModal/CreateDeckModal'
-import type { Deck, CreateDeckForm } from '../types/flashcard.types'
+import type { Deck } from '../types/flashcard.types'
 
 export function FlashcardsPage() {
-    const { data: decks = [], isLoading } = useDecks()
+    const { data: decks = [], isLoading, isError } = useDecks()
     const { mutate: uploadFile, isPending: isUploading } = useUploadFile()
     const [showCreate, setShowCreate] = useState(false)
 
-    const handleCreate = (form: CreateDeckForm) => {
-        if (!form.file) {
+    const handleCreate = (file: File | null) => {
+        if (!file) {
             alert('Selecciona un archivo primero.')
             return
         }
-        uploadFile(form.file, {
+
+        uploadFile(file, {
             onSuccess: () => setShowCreate(false),
         })
     }
 
     if (isLoading) return <p className="text-muted">Cargando mazos...</p>
+    if (isError) return <p className="text-red-500">Error cargando mazos. Intenta recargar la página.</p>
 
     return (
         <div className="space-y-6">

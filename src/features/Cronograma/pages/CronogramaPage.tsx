@@ -1,4 +1,5 @@
 import { Card } from '@/components/ui/Card'
+import { cn } from '@/lib/utils'
 
 const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -37,5 +38,3 @@ export function CronogramaPage() {
         </div>
     )
 }
-
-import { cn } from '@/lib/utils'

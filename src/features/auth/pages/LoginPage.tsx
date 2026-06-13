@@ -3,8 +3,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link } from 'react-router-dom'
-import { useLogin } from '../hooks/useLogin'
-import { LoginPayload } from '../types/auth.types'
+import { useLogin } from '../hooks'
+import type { LoginCredentials } from '@/features/auth/types/auth.types'
 import { ROUTES } from '@/app/router/routes'
 import { cn } from '@/lib/utils'
 
@@ -22,8 +22,8 @@ export function LoginPage() {
     })
 
     const onSubmit = (data: Form) => {
-        const payload: LoginPayload = {
-            correo: data.correo,
+        const payload: LoginCredentials = {
+            email: data.correo,
             password: data.password,
         }
 

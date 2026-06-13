@@ -16,5 +16,5 @@
     }
   },
 
-  "include": ["src", "src/app/router/AppRouter.tsx"]
+  "include": ["src"]
 }

@@ -1,9 +1,10 @@
 import { useAuthStore } from '@/features/auth/store/authStore'
-import { StatsCards } from './StatsCards'
-import { TodayRecommendation } from './TodayRecommendation'
-import { UpcomingExam } from './UpcomingExam'
-import { RetentionByTopic } from './RetentionByTopic'
-import { RecentActivity } from './RecentActivity'
+import { StatsCards } from '../components/StatsCards'
+import { TodayRecommendation } from '../components/TodayRecommendation'
+import { UpcomingExam } from '../components/UpcomingExam'
+import { RetentionByTopic } from '../components/RetentionByTopic'
+import { RecentActivity } from '../components/RecentActivity'
+
 
 export function DashboardPage() {
     const user = useAuthStore((s) => s.user)

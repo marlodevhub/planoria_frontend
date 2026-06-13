@@ -3,8 +3,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link } from 'react-router-dom'
-import { useRegister } from '../hooks/useRegister'
-import { RegisterPayload } from '../types/auth.types'
+import { useRegister } from '../hooks'
+import type { RegisterCredentials } from '@/features/auth/types/auth.types'
 import { ROUTES } from '@/app/router/routes'
 import { cn } from '@/lib/utils'
 
@@ -31,10 +31,10 @@ export function RegisterPage() {
     const strength = getStrength(password)
 
     const onSubmit = (data: FormFields) => {
-        const payload: RegisterPayload = {
+        const payload: RegisterCredentials = {
             nombre: data.nombre,
             apellido: data.apellido,
-            correo: data.correo,
+            email: data.correo,
             password: data.password,
         }
         register_(payload)

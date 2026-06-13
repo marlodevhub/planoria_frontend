@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { authService } from '../services/authService'
-import { useAuthStore } from '../store/authStore'
+import { cursoService } from '../services/cursoService'
+import { useCouserStore } from '../store/couserStore'
 import type { RegisterCredentials } from '../types/auth.types'
 import { AuthError } from '../types/auth.types'
 import { ROUTES } from '@/app/router/routes'
 
-export function useRegister() {
+export function CourserRegister() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const { setAuth, setError, setLoading } = useAuthStore()

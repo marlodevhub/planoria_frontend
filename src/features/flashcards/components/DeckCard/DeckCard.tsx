@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useStudyStore } from '@/features/study/store/studyStore'
+import { buildRoute } from '@/app/router/routes'
 import type { Deck } from '../../types/flashcard.types'
 
 interface DeckCardProps {
@@ -8,11 +8,9 @@ interface DeckCardProps {
 
 export function DeckCard({ deck }: DeckCardProps) {
     const navigate = useNavigate()
-    const setMazo = useStudyStore((state) => state.setMazo)
 
     const handleEmpezar = () => {
-        // No tenemos UploadFileResponse aquí, navegamos y StudyPage hará el fetch
-        navigate(`/workspace/flashcards/${deck.idArchivo}/study`)
+        navigate(buildRoute.flashcardsStudy(String(deck.idArchivo)))
     }
 
     return (

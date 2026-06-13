@@ -52,3 +52,18 @@ export interface StudyResult {
     unknown: number
     total: number
 }
+
+// ─── API Upload Response ──────────────────────────────────
+export interface Flashcard {
+    idFlashcard: number
+    pregunta: string
+    respuesta: string
+}
+
+export interface AnalisisIA {
+    flashcards: Flashcard[]
+}
+
+export interface UploadFileResponse {
+    analisisIA?: AnalisisIA[]
+}
