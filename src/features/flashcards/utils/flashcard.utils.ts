@@ -1,7 +1,6 @@
-import type { ManualCard } from '../types/flashcard.types'
+export interface ManualCard {
+  id: string;
+  question: string;
+  answer: string;
+}
 
-export const makeCard = (): ManualCard => ({
-    id: crypto.randomUUID(),
-    question: '',
-    answer: '',
-})

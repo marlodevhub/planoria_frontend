@@ -1,69 +1,42 @@
-// ─── Formulario UI ────────────────────────────────────────
-export type DeckMethod = 'tema' | 'archivo' | 'manual'
-export type Difficulty = 'easy' | 'med' | 'hard'
-
-export interface ManualCard {
-    id: string
-    question: string
-    answer: string
-}
-
-export interface CreateDeckForm {
-    courseName: string
-    title: string
-    method: DeckMethod
-    difficulty: Difficulty | null
-    topic: string
-    cardCount: number
-    file: File | null
-    manualCards: ManualCard[]
-}
-
-// ─── GET /archivo ─────────────────────────────────────────
-export interface Deck {
-    idArchivo: number
-    idUsuario: number
-    nombreArchivo: string
-    urlArchivo: string
-    tipoArchivo: string
-    tamanoMB: number
-    fechaSubida: string
-    estado: string
-}
-
-// ─── Sesión de estudio UI ─────────────────────────────────
-export interface Card {
-    id: string
-    question: string
-    answer: string
-}
-
-export interface StudySession {
-    cards: Card[]
-    idx: number
-    known: number
-    unknown: number
-    done: boolean
-    flipped: boolean
-}
-
-export interface StudyResult {
-    known: number
-    unknown: number
-    total: number
-}
-
-// ─── API Upload Response ──────────────────────────────────
-export interface Flashcard {
-    idFlashcard: number
-    pregunta: string
-    respuesta: string
-}
-
-export interface AnalisisIA {
-    flashcards: Flashcard[]
+// POST /files/upload
+export interface UploadFileDto {
+  courseId: number;
+  file: File;
 }
 
 export interface UploadFileResponse {
-    analisisIA?: AnalisisIA[]
+  id: number;
+  originalFilename: string;
+  fileSize: number;
+  fileType: string;
+  uploadStatus: string;
+  uploadedAt: string;
 }
+
+// POST /ai/generate/flashcards
+export interface GenerateFlashcardsDto {
+  fileId: number;
+  contentType: "flashcard";
+  topic: string;
+  targetCourseId: number;
+  numberOfItems: number;
+  difficulty: "easy" | "medium" | "hard";
+  language: string;
+}
+
+export interface GenerateFlashcardsResponse {
+  generationId: number;
+  fileId: number;
+  contentType: string;
+  status: string;
+  progress: number;
+  estimatedTime: number;
+  createdAt: string;
+}
+
+export interface ManualCard {
+  id: string;
+  question: string;
+  answer: string;
+}
+

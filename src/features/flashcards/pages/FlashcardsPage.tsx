@@ -1,55 +1,50 @@
-import { useState } from 'react'
-import { useUploadFile } from '../hooks/upload/useUploadFile'
-import { useDecks } from '../hooks/deck'
-import { DeckCard } from '../components/DeckCard/DeckCard'
-import { CreateDeckModal } from '../components/CreateDeckModal/CreateDeckModal'
-import type { Deck } from '../types/flashcard.types'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { GenerateFlashcardsModal } from "../components/GenerateFlashcardsModal";
 
 export function FlashcardsPage() {
-    const { data: decks = [], isLoading, isError } = useDecks()
-    const { mutate: uploadFile, isPending: isUploading } = useUploadFile()
-    const [showCreate, setShowCreate] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false);
 
-    const handleCreate = (file: File | null) => {
-        if (!file) {
-            alert('Selecciona un archivo primero.')
-            return
-        }
-
-        uploadFile(file, {
-            onSuccess: () => setShowCreate(false),
-        })
-    }
-
-    if (isLoading) return <p className="text-muted">Cargando mazos...</p>
-    if (isError) return <p className="text-red-500">Error cargando mazos. Intenta recargar la página.</p>
-
-    return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold text-text">Mis flashcards</h1>
-                <button
-                    onClick={() => setShowCreate(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-xl hover:bg-accent/90 transition-colors"
-                >
-                    <i className="ti ti-plus text-[15px]" aria-hidden="true" />
-                    Nuevo mazo
-                </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {decks.map((deck) => (
-                    <DeckCard key={deck.idArchivo} deck={deck} />
-                ))}
-            </div>
-
-            {showCreate && (
-                <CreateDeckModal
-                    onClose={() => setShowCreate(false)}
-                    onSubmit={handleCreate}
-                    isLoading={isUploading}
-                />
-            )}
+  return (
+    <div className="space-y-5 animate-fade-up">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-foreground tracking-tight">
+            Flashcards
+          </h1>
+          <p className="text-muted-foreground text-sm mt-0.5">
+            Generá mazos desde tus archivos
+          </p>
         </div>
-    )
+        <Button onClick={() => setModalOpen(true)} size="sm">
+          <i className="ti ti-sparkles text-[15px]" />
+          Generar mazo
+        </Button>
+      </div>
+
+      {/* Contenido — por implementar */}
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="relative mb-5">
+          <div className="h-14 w-14 rounded-2xl bg-muted flex items-center justify-center">
+            <i className="ti ti-cards text-[26px] text-muted-foreground" />
+          </div>
+          <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-primary flex items-center justify-center">
+            <i className="ti ti-sparkles text-[11px] text-primary-foreground" />
+          </div>
+        </div>
+        <p className="font-semibold text-foreground mb-1">Sin mazos todavía</p>
+        <p className="text-muted-foreground text-sm mb-5 max-w-[220px] leading-relaxed">
+          Generá tu primer mazo subiendo un PDF de tu curso
+        </p>
+      </div>
+
+      {/* Modal */}
+      <GenerateFlashcardsModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+      />
+    </div>
+  );
 }
+
