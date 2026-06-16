@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { SidebarItem } from "./SidebarItem";
 import { navItems } from "./navItems";
+import { useLogout } from "@/features/auth/hooks";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -16,7 +17,8 @@ export function Sidebar({
   onNavClick,
   variant = "desktop",
 }: SidebarProps) {
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
+  const logout = useLogout();
 
   const isTablet = variant === "tablet";
   const isDesktop = variant === "desktop";
@@ -147,4 +149,3 @@ export function Sidebar({
     </aside>
   );
 }
-
