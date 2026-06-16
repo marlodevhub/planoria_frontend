@@ -1,4 +1,4 @@
-
+// src/features/auth/services/authService.ts
 import api from '@/lib/axios'
 import { AUTH_API_ROUTES } from '../constants/api'
 import { useAuthStore } from '../store/authStore'
@@ -13,13 +13,13 @@ import { AuthError, AuthErrorCode } from '../types/auth.types'
 
 function mapAuthResponse(data: ApiAuthResponse): AuthResponse {
     return {
-        token: data.token,
+        token: data.accessToken,
         refreshToken: data.refreshToken,
         user: {
-            id: String(data.idUsuario),
-            nombre: data.nombre,
-            correo: data.correo,
-            rol: data.rol,
+            id: String(data.user.id),
+            nombre: data.user.fullName,
+            correo: data.user.email,
+            rol: data.user.rol ?? 'student',
         },
     }
 }
@@ -31,17 +31,14 @@ function parseAuthError(error: any): AuthError {
 
     if (status === 401 || code === 'UNAUTHORIZED')
         return new AuthError(AuthErrorCode.UNAUTHORIZED, 'No autorizado', error)
-
     if (status === 409 || code === 'EMAIL_ALREADY_EXISTS')
         return new AuthError(AuthErrorCode.EMAIL_ALREADY_EXISTS, 'El email ya está registrado', error)
-
     if (status === 400) {
         if (code === 'INVALID_CREDENTIALS')
             return new AuthError(AuthErrorCode.INVALID_CREDENTIALS, 'Credenciales inválidas', error)
         if (code === 'WEAK_PASSWORD')
             return new AuthError(AuthErrorCode.WEAK_PASSWORD, 'La contraseña es muy débil', error)
     }
-
     if (!navigator.onLine)
         return new AuthError(AuthErrorCode.NETWORK_ERROR, 'Sin conexión a internet', error)
 
@@ -81,7 +78,6 @@ export const authService = {
                 refreshToken: token,
             })
             const authResponse = mapAuthResponse(data)
-            // Sin dynamic import — import estático directo al store
             useAuthStore.getState().setToken(authResponse.token, authResponse.refreshToken)
             return authResponse
         } catch (error) {

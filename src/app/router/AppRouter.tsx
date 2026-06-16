@@ -6,14 +6,13 @@ import { WorkspaceLayout } from '@/components/layout/WorkspaceLayout'
 import { LandingPage } from '@/features/landing/pages/LandingPage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
-
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
 import { FlashcardsPage } from '@/features/flashcards/pages/FlashcardsPage'
 import { StudyPage } from '@/features/flashcards/pages/StudyPage'
 import { QuizzesPage } from '@/features/quizzes/pages/QuizzesPage'
 import { CronogramaPage } from '@/features/cronograma/pages/CronogramaPage'
 import { ProgresosPage } from '@/features/progresos/pages/ProgresosPage'
-import { CursosPage } from '@/features/cursos/pages/CursosPage'
+import { CoursesPage } from '@/features/courses/pages/CoursesPage'
 
 // Definición de rutas
 export function AppRouter() {
@@ -36,7 +35,7 @@ export function AppRouter() {
                         <Route path={ROUTES.QUIZZES} element={<QuizzesPage />} />
                         <Route path={ROUTES.CRONOGRAMA} element={<CronogramaPage />} />
                         <Route path={ROUTES.PROGRESO} element={<ProgresosPage />} />
-                        <Route path={ROUTES.CURSOS} element={<CursosPage />} />
+                        <Route path={ROUTES.CURSOS} element={<CoursesPage />} />
                     </Route>
                 </Route>
 

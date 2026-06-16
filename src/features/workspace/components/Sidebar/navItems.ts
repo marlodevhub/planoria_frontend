@@ -12,5 +12,5 @@ export const navItems: NavItem[] = [
     { key: 'quizzes', label: 'Quizzes', shortLabel: 'Quiz', icon: 'ti-puzzle', path: '/workspace/quizzes' },
     { key: 'cronograma', label: 'Cronograma', shortLabel: 'Crono', icon: 'ti-calendar', path: '/workspace/cronograma' },
     { key: 'progreso', label: 'Progreso', shortLabel: 'Stats', icon: 'ti-chart-bar', path: '/workspace/progreso' },
-    { key: 'cursos', label: 'Cursos', shortLabel: 'Cursos', icon: 'ti-book', path: '/workspace/cursos' },
+    { key: 'cursos', label: 'Cursos', shortLabel: 'Cursos', icon: 'ti-book', path: '/workspace/courses' },
 ]

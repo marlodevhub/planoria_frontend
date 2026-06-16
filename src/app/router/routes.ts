@@ -8,7 +8,7 @@ export const ROUTES = {
     QUIZZES: '/workspace/quizzes',
     CRONOGRAMA: '/workspace/cronograma',
     PROGRESO: '/workspace/progreso',
-    CURSOS: '/workspace/cursos',
+    CURSOS: '/workspace/courses',
 } as const
 //constantes de paths
 export const buildRoute = {
