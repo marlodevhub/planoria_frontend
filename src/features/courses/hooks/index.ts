@@ -1,6 +1,9 @@
-// hooks/index.ts
 export { useCourses } from './useCourses'
 export { useCourse } from './useCourse'
 export { useCreateCourse } from './useCreateCourse'
 export { useUpdateCourse } from './useUpdateCourse'
 export { useDeleteCourse } from './useDeleteCourse'
+export { useCourseMembers, useAddMember, useRemoveMember } from './useCourseMembers'
+export { useCourseExams, useCreateExam, useUpdateExam, useDeleteExam } from './useCourseExams'
+export { useCourseStats } from './useCourseStats'
+export { useCourseExamProgress, useCourseReadiness, useCourseWeaknesses } from './useCourseExamProgress'

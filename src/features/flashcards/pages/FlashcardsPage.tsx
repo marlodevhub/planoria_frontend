@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { GenerateFlashcardsModal } from "../components/GenerateFlashcardsModal";
 import { DeckCard } from "../components/DeckCard";
@@ -22,12 +23,14 @@ function DecksSkeleton() {
 export function FlashcardsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const { data: decks, isLoading, isError } = useDecks();
+  const navigate = useNavigate();
 
-  const handleStudy = (_deck: Deck) => {};
+  const handleStudy = (deck: Deck) => {
+    navigate(`/workspace/flashcards/${deck.id}`);
+  };
 
   return (
     <div className="space-y-5 animate-fade-up">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-foreground tracking-tight">
@@ -47,10 +50,8 @@ export function FlashcardsPage() {
         </Button>
       </div>
 
-      {/* Loading */}
       {isLoading && <DecksSkeleton />}
 
-      {/* Error */}
       {isError && (
         <div className="flex items-center gap-3 p-4 rounded-xl bg-destructive/5 border border-destructive/15">
           <i className="ti ti-alert-circle text-destructive text-[18px] flex-shrink-0" />
@@ -65,7 +66,6 @@ export function FlashcardsPage() {
         </div>
       )}
 
-      {/* Empty */}
       {!isLoading && !isError && decks?.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div className="relative mb-5">
@@ -89,7 +89,6 @@ export function FlashcardsPage() {
         </div>
       )}
 
-      {/* Grid */}
       {!isLoading && !isError && !!decks?.length && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {decks.map((deck) => (
@@ -98,7 +97,6 @@ export function FlashcardsPage() {
         </div>
       )}
 
-      {/* Modal */}
       <GenerateFlashcardsModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -106,4 +104,3 @@ export function FlashcardsPage() {
     </div>
   );
 }
-

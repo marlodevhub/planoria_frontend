@@ -1,24 +1,22 @@
 import { create } from 'zustand'
-import { UploadFileResponse } from '../types/study.types'
+import type { StudySession } from '../types/study.types'
 
-// Definimos los modos para que siempre sepamos qué está estudiando el usuario
 export type StudyMode = 'FLASHCARDS' | 'QUIZ' | null
 
 interface StudyState {
-    currentMazo: UploadFileResponse | null
+    currentSession: StudySession | null
     studyMode: StudyMode
 
-    // Acciones para modificar el estado
-    setMazo: (mazo: UploadFileResponse | null) => void
+    setCurrentSession: (session: StudySession | null) => void
     setStudyMode: (mode: StudyMode) => void
     clearStudy: () => void
 }
 
 export const useStudyStore = create<StudyState>((set) => ({
-    currentMazo: null,
+    currentSession: null,
     studyMode: null,
 
-    setMazo: (mazo) => set({ currentMazo: mazo }),
+    setCurrentSession: (session) => set({ currentSession: session }),
     setStudyMode: (mode) => set({ studyMode: mode }),
-    clearStudy: () => set({ currentMazo: null, studyMode: null }),
+    clearStudy: () => set({ currentSession: null, studyMode: null }),
 }))

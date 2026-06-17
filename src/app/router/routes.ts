@@ -4,13 +4,14 @@ export const ROUTES = {
   REGISTER: "/register",
   DASHBOARD: "/workspace",
   FLASHCARDS: "/workspace/flashcards",
-  // FLASHCARDS_STUDY: '/workspace/flashcards/:deckId/study',
   QUIZZES: "/workspace/quizzes",
   CRONOGRAMA: "/workspace/cronograma",
   PROGRESO: "/workspace/progreso",
   CURSOS: "/workspace/courses",
+  PERFIL: "/workspace/perfil",
 } as const;
 
-// export const buildRoute = {
-//   flashcardsStudy: (deckId: string) => `/workspace/flashcards/${deckId}/study`,
-// }
+export const buildRoute = {
+  deckDetail: (deckId: number) => `/workspace/flashcards/${deckId}`,
+  studySession: (deckId: number) => `/workspace/flashcards/${deckId}/study`,
+}

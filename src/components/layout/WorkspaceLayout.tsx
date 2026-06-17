@@ -48,7 +48,7 @@ export function WorkspaceLayout() {
   if (screen === "mobile") {
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <header className="flex items-center px-4 h-14 flex-shrink-0">
+        <header className="flex items-center px-4 h-14 flex-shrink-0 relative z-10">
           <div className="h-7 w-7 rounded-lg bg-primary flex items-center justify-center">
             <span className="text-primary-foreground font-black text-xs">
               P
@@ -57,7 +57,12 @@ export function WorkspaceLayout() {
           <span className="font-bold text-primary text-sm ml-2">Planoria</span>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 pb-28">
+        <main className="flex-1 overflow-y-auto p-4 pb-28 relative">
+          <div className="pointer-events-none fixed inset-0 overflow-hidden -z-10">
+            <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/[0.02]" />
+            <div className="absolute -bottom-20 -left-20 h-60 w-60 rounded-full bg-indigo-500/[0.02]" />
+            <div className="absolute top-1/3 right-1/4 h-32 w-32 rounded-full bg-purple-500/[0.015]" />
+          </div>
           <Outlet />
         </main>
 
@@ -98,7 +103,11 @@ export function WorkspaceLayout() {
           </div>
         )}
 
-        <main className="flex-1 overflow-y-auto p-5">
+        <main className="flex-1 overflow-y-auto p-5 relative">
+          <div className="pointer-events-none fixed inset-0 overflow-hidden -z-10">
+            <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/[0.025]" />
+            <div className="absolute -bottom-20 -left-20 h-60 w-60 rounded-full bg-indigo-500/[0.02]" />
+          </div>
           <Outlet />
         </main>
       </div>
@@ -122,7 +131,12 @@ export function WorkspaceLayout() {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-6 relative">
+          <div className="pointer-events-none fixed inset-0 overflow-hidden -z-10">
+            <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/[0.025]" />
+            <div className="absolute top-1/2 left-1/4 h-48 w-48 rounded-full bg-indigo-500/[0.015]" />
+            <div className="absolute -bottom-20 -left-20 h-60 w-60 rounded-full bg-purple-500/[0.02]" />
+          </div>
           <Outlet />
         </main>
       </div>

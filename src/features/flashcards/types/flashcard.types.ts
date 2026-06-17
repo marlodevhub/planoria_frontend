@@ -1,4 +1,3 @@
-// POST /files/upload
 export interface UploadFileDto {
   courseId: number;
   file: File;
@@ -13,7 +12,6 @@ export interface UploadFileResponse {
   uploadedAt: string;
 }
 
-// POST /ai/generate/flashcards
 export interface GenerateFlashcardsDto {
   fileId: number;
   contentType: "flashcard";
@@ -48,5 +46,112 @@ export interface Deck {
   totalCards: number;
   masteredPercentage: number;
   dueCardsCount: number;
+}
+
+export interface DeckDetail {
+  id: number;
+  name: string;
+  description: string;
+  courseId: number;
+  courseName: string;
+  colorHex: string;
+  totalCards: number;
+  masteredPercentage: number;
+  dueCardsCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateDeckDto {
+  name: string;
+  description?: string;
+  courseId: number;
+  colorHex?: string;
+}
+
+export interface UpdateDeckDto {
+  name?: string;
+  description?: string;
+  colorHex?: string;
+}
+
+export interface Flashcard {
+  id: number;
+  question: string;
+  answer: string;
+  hint: string | null;
+  difficulty: 'easy' | 'medium' | 'hard';
+  tags: string[];
+  deckId: number;
+  deckName: string;
+  lastReviewed: string | null;
+  nextReview: string;
+  interval: number;
+  ease: number;
+  repetitions: number;
+  createdAt: string;
+}
+
+export interface CreateFlashcardDto {
+  question: string;
+  answer: string;
+  hint?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  tags?: string[];
+}
+
+export interface UpdateFlashcardDto {
+  question?: string;
+  answer?: string;
+  hint?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  tags?: string[];
+}
+
+export interface PaginatedFlashcards {
+  items: Flashcard[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  hasNextPage: boolean;
+}
+
+export interface ImportFlashcardsDto {
+  deckId: number;
+  cards: { question: string; answer: string }[];
+}
+
+export interface FlashcardProgress {
+  deckId: number;
+  deckName: string;
+  totalCards: number;
+  newCards: number;
+  learningCards: number;
+  reviewCards: number;
+  masteredCards: number;
+  masteryPercentage: number;
+  cardsReviewedToday: number;
+  averageEase: number;
+  averageInterval: number;
+}
+
+export interface DeckMastery {
+  deckId: number;
+  deckName: number;
+  masteryPercentage: number;
+  byDifficulty: { easy: number; medium: number; hard: number };
+  trend: { date: string; mastery: number }[];
+  predictedMastery: number;
+  estimatedDaysToMastery: number;
+}
+
+export interface SearchFlashcardsDto {
+  query?: string;
+  deckId?: number;
+  courseId?: number;
+  tags?: string[];
+  difficulty?: 'easy' | 'medium' | 'hard';
+  page?: number;
+  pageSize?: number;
 }
 

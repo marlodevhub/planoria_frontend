@@ -1,32 +1,78 @@
 import api from '@/lib/axios'
-import type { UploadFileResponse } from '../types/study.types'
+import { STUDY_API_ROUTES } from '../constants/api'
+import type {
+  StudySession,
+  StartSessionResponse,
+  NextCardResponse,
+  SubmitResultRequest,
+  SubmitResultResponse,
+  CompleteSessionResponse,
+  DueCardsInfo,
+  CardDetail,
+} from '../types/study.types'
 
-/**
- * Servicio para la gestión de documentos y análisis IA
- */
 export const studyService = {
-    /**
-     * Sube el archivo y recibe el objeto de análisis de la IA
-     */
-    async uploadDocument(file: File): Promise<UploadFileResponse> {
-        const formData = new FormData()
-        // Asegúrate de que 'archivo' coincida exactamente con el nombre esperado por tu backend
-        formData.append('archivo', file)
+  async getSessions(): Promise<StudySession[]> {
+    const { data } = await api.get<StudySession[]>(STUDY_API_ROUTES.SESSIONS)
+    return data
+  },
 
-        const response = await api.post<UploadFileResponse>('/archivo', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        })
+  async getSession(id: number): Promise<StudySession> {
+    const { data } = await api.get<StudySession>(STUDY_API_ROUTES.SESSION_BY_ID(id))
+    return data
+  },
 
-        return response.data
-    },
+  async startSession(id: number): Promise<StartSessionResponse> {
+    const { data } = await api.post<StartSessionResponse>(
+      STUDY_API_ROUTES.START_SESSION(id),
+    )
+    return data
+  },
 
-    /**
-     * Lista los documentos subidos anteriormente
-     */
-    async getAllDocuments(): Promise<UploadFileResponse[]> {
-        const response = await api.get<UploadFileResponse[]>('/archivos')
-        return response.data
-    }
+  async getNextCard(id: number): Promise<NextCardResponse> {
+    const { data } = await api.post<NextCardResponse>(
+      STUDY_API_ROUTES.NEXT_CARD(id),
+    )
+    return data
+  },
+
+  async submitResult(
+    sessionId: number,
+    req: SubmitResultRequest,
+  ): Promise<SubmitResultResponse> {
+    const { data } = await api.post<SubmitResultResponse>(
+      STUDY_API_ROUTES.SUBMIT_RESULT(sessionId),
+      req,
+    )
+    return data
+  },
+
+  async pauseSession(id: number): Promise<void> {
+    await api.post(STUDY_API_ROUTES.PAUSE_SESSION(id))
+  },
+
+  async resumeSession(id: number): Promise<void> {
+    await api.post(STUDY_API_ROUTES.RESUME_SESSION(id))
+  },
+
+  async completeSession(id: number): Promise<CompleteSessionResponse> {
+    const { data } = await api.post<CompleteSessionResponse>(
+      STUDY_API_ROUTES.COMPLETE_SESSION(id),
+    )
+    return data
+  },
+
+  async getDueCards(deckId: number): Promise<DueCardsInfo> {
+    const { data } = await api.get<DueCardsInfo>(
+      STUDY_API_ROUTES.DUE_CARDS(deckId),
+    )
+    return data
+  },
+
+  async getCardDetail(cardId: number): Promise<CardDetail> {
+    const { data } = await api.get<CardDetail>(
+      STUDY_API_ROUTES.CARD_DETAIL(cardId),
+    )
+    return data
+  },
 }
