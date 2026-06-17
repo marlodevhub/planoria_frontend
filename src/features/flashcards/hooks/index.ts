@@ -1,3 +1,10 @@
 export { useUploadFile } from "./useUploadFile";
 export { useGenerateFlashcards } from "./useGenerateFlashcards";
 export { useDecks } from "./useDecks";
+export { useDeck } from "./useDeck";
+export { useDeckCards } from "./useDeckCards";
+export { useDeleteDeck } from "./useDeleteDeck";
+export { useStartSession } from "./study/useStartSession";
+export { useSubmitAnswer } from "./study/useSubmitAnswer";
+export { useEndSession } from "./study/useEndSession";
+export { useNextCard } from "./study/useNextCard";

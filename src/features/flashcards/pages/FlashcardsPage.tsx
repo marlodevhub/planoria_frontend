@@ -1,8 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { GenerateFlashcardsModal } from "../components/GenerateFlashcardsModal";
 import { DeckCard } from "../components/DeckCard";
 import { useDecks } from "../hooks";
+import { buildRoute } from "@/app/router/routes";
 import type { Deck } from "../types/flashcard.types";
 
 function DecksSkeleton() {
@@ -20,10 +22,13 @@ function DecksSkeleton() {
 }
 
 export function FlashcardsPage() {
+  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const { data: decks, isLoading, isError } = useDecks();
 
-  const handleStudy = (_deck: Deck) => {};
+  const handleStudy = (deck: Deck) => {
+    navigate(buildRoute.deck(deck.id));
+  };
 
   return (
     <div className="space-y-5 animate-fade-up">
@@ -92,7 +97,7 @@ export function FlashcardsPage() {
       {/* Grid */}
       {!isLoading && !isError && !!decks?.length && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {decks.map((deck) => (
+          {decks.map((deck: Deck) => (
             <DeckCard key={deck.id} deck={deck} onStudy={handleStudy} />
           ))}
         </div>

@@ -50,3 +50,75 @@ export interface Deck {
   dueCardsCount: number;
 }
 
+//------------------------------------
+
+export interface DeckDetail {
+  id: number;
+  name: string;
+  description: string;
+  courseId: number;
+  courseName: string;
+  totalCards: number;
+  spacedRepetitionEnabled: boolean;
+  masteredCards: number;
+  learningCards: number;
+  notStudiedCards: number;
+  progressPercentage: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Flashcard {
+  id: number;
+  question: string;
+  answer: string;
+  hint: string;
+  difficulty: string;
+  tags: string[];
+  position: number;
+  isActive: boolean;
+  deckId: number;
+  lastReviewedAt: string | null;
+  nextReviewDate: string | null;
+  repetitionCount: number;
+  easeFactor: number;
+}
+
+//------------------------------------
+
+// POST /study/sessions
+export interface StartStudySessionDto {
+  deckId: number;
+  sessionType: "normal" | "repeat_failed" | "quick";
+}
+
+// Response de iniciar sesión y terminar sesión
+export interface StudySession {
+  id: number;
+  deckId: number;
+  deckName: string;
+  startedAt: string;
+  endedAt: string | null;
+  cardsReviewed: number;
+  cardsKnown: number;
+  cardsUnknown: number;
+  sessionType: string;
+  performanceScore: number;
+}
+
+// GET /study/sessions/:id/next
+export interface NextCard {
+  sessionId: number;
+  flashcard: Flashcard | null;
+  current: number;
+  total: number;
+  remainingCards: number;
+}
+
+// POST /study/sessions/:id/answer
+export interface SubmitAnswerDto {
+  flashcardId: number;
+  knewIt: boolean;
+  responseTimeMs: number;
+}
+
