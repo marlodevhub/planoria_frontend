@@ -9,6 +9,7 @@ import { RegisterPage } from "@/features/auth/pages/RegisterPage";
 import { DashboardPage } from "@/features/dashboard/pages/DashboardPage";
 import { FlashcardsPage } from "@/features/flashcards/pages/FlashcardsPage";
 import { DeckPage } from "@/features/flashcards/pages/DeckPage";
+import { StudyPage } from "@/features/flashcards/pages/StudyPage";
 import { QuizzesPage } from "@/features/quizzes/pages/QuizzesPage";
 import { CronogramaPage } from "@/features/cronograma/pages/CronogramaPage";
 import { ProgresosPage } from "@/features/progresos/pages/ProgresosPage";
@@ -18,7 +19,6 @@ import { CoursesPage } from "@/features/courses/pages/CoursesPage";
 export function AppRouter() {
   return (
     <BrowserRouter>
-      s
       <Routes>
         {/* Públicas */}
         <Route element={<PublicLayout />}>
@@ -32,6 +32,7 @@ export function AppRouter() {
           <Route element={<WorkspaceLayout />}>
             <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
             <Route path={ROUTES.DECK} element={<DeckPage />} />
+            <Route path={ROUTES.FLASHCARDS_STUDY} element={<StudyPage />} />
             <Route path={ROUTES.FLASHCARDS} element={<FlashcardsPage />} />
             <Route path={ROUTES.QUIZZES} element={<QuizzesPage />} />
             <Route path={ROUTES.CRONOGRAMA} element={<CronogramaPage />} />
@@ -45,4 +46,3 @@ export function AppRouter() {
     </BrowserRouter>
   );
 }
-

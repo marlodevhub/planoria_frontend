@@ -5,6 +5,7 @@ export const ROUTES = {
   DASHBOARD: "/workspace",
   FLASHCARDS: "/workspace/flashcards",
   DECK: "/workspace/flashcards/:deckId",
+  FLASHCARDS_STUDY: "/workspace/flashcards/:deckId/study", // ← descomentá
   QUIZZES: "/workspace/quizzes",
   CRONOGRAMA: "/workspace/cronograma",
   PROGRESO: "/workspace/progreso",
@@ -12,5 +13,6 @@ export const ROUTES = {
 } as const;
 
 export const buildRoute = {
-  deck: (deckId: number | string) => `/workspace/flashcards/${deckId}`,
+  deck: (deckId: number) => `/workspace/flashcards/${deckId}`,
+  study: (deckId: number) => `/workspace/flashcards/${deckId}/study`, // ← nueva
 };
