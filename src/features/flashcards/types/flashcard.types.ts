@@ -40,3 +40,13 @@ export interface ManualCard {
   answer: string;
 }
 
+export interface Deck {
+  id: number;
+  name: string;
+  courseName: string;
+  colorHex: string;
+  totalCards: number;
+  masteredPercentage: number;
+  dueCardsCount: number;
+}
+
