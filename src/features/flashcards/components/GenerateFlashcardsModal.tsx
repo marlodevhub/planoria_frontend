@@ -249,18 +249,16 @@ export function GenerateFlashcardsModal({
       <DialogContent className="max-w-md p-0 overflow-visible bg-white border border-border shadow-xl">
         <div className="px-6 pt-5 pb-4 border-b border-border">
           <DialogHeader>
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex  items-center justify-between mb-3 mr-10">
               <StepIndicator current={step} />
-              <span className="text-xs text-muted-foreground font-mono">
-                {step}/2
-              </span>
             </div>
-            <DialogTitle className="text-base text-foreground flex items-center gap-2">
-              <i className="ti ti-sparkles text-accent" aria-hidden="true" />
+
+            <DialogTitle className="text-base text-foreground">
               {step === 1
                 ? "Seleccionar curso y archivo"
                 : "Configurar generación"}
             </DialogTitle>
+
             <DialogDescription className="text-xs text-muted-foreground mt-1">
               {step === 1
                 ? "Elegí el curso y subí el PDF fuente"
@@ -276,7 +274,7 @@ export function GenerateFlashcardsModal({
               onSubmit={form1.handleSubmit(onStep1Submit)}
               className="overflow-visible"
             >
-              <div className="px-6 py-4 space-y-4 max-h-[60vh] overflow-y-auto">
+              <div className=" px-6  py-4 space-y-4 max-h-[60vh] overflow-y-auto">
                 <FormField
                   control={form1.control}
                   name="courseId"

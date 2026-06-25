@@ -1,15 +1,17 @@
 // features/dashboard/components/TodayRecommendation.tsx
 
+import { Button } from "@/components/ui/button";
+
 export function TodayRecommendation() {
   return (
-    <div className="bg-white border border-border rounded-2xl p-6 h-full flex flex-col gap-4 hover:border-accent/30 transition-all duration-300 shadow-sm">
+    <div className="bg-card border border-border rounded-2xl p-6 h-full flex flex-col gap-4 shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-md">
+      {/* ─── Header ─── */}
       <div className="flex items-start gap-4">
-        {/* Estrella con accent */}
-        <div className="bg-accent rounded-xl p-2.5 text-accent-foreground text-xl shrink-0 shadow-lg shadow-accent/20">
-          ✦
+        <div className="bg-primary/10 rounded-xl p-2.5 text-primary text-xl shrink-0 shadow-lg shadow-primary/20">
+          <i className="ti ti-sparkles text-2xl" aria-hidden="true" />
         </div>
         <div>
-          <h2 className="text-text font-semibold text-base">
+          <h2 className="text-foreground font-semibold text-base">
             Recomendación de hoy
           </h2>
           <p className="text-muted-foreground text-sm mt-0.5">
@@ -18,28 +20,26 @@ export function TodayRecommendation() {
         </div>
       </div>
 
-      <p className="text-text text-sm leading-relaxed">
+      {/* ─── Descripción ─── */}
+      <p className="text-foreground/80 text-sm leading-relaxed">
         Empieza creando un curso y generando tu primer set de flashcards con IA.
       </p>
 
+      {/* ─── Botones ─── */}
       <div className="mt-auto flex items-center gap-3 flex-wrap">
-        {/* Botón principal - con accent */}
-        <button className="flex items-center gap-2 text-sm text-accent-foreground font-medium bg-accent border border-accent rounded-xl px-4 py-2 hover:bg-accent/80 hover:border-accent/80 transition-all duration-300 group shadow-sm shadow-accent/20">
+        <Button className="gap-2 shadow-sm shadow-primary/20 hover:shadow-primary/30 transition-all duration-300">
           Ver cronograma del día
-          <span className="text-base group-hover:translate-x-1 transition-transform">
-            →
-          </span>
-        </button>
+          <i
+            className="ti ti-arrow-right text-base group-hover:translate-x-1 transition-transform"
+            aria-hidden="true"
+          />
+        </Button>
 
-        {/* Botón estrella - con secondary */}
-        <button className="flex items-center gap-2 text-sm text-secondary-foreground font-medium bg-secondary border border-secondary rounded-xl px-4 py-2 hover:bg-secondary/80 hover:border-secondary/80 transition-all duration-300 group shadow-sm shadow-secondary/20">
-          <span className="group-hover:scale-110 transition-transform inline-block">
-            ✦
-          </span>
+        <Button variant="outline" className="gap-2">
+          <i className="ti ti-sparkles" aria-hidden="true" />
           Nueva sesión
-        </button>
+        </Button>
       </div>
     </div>
   );
 }
-

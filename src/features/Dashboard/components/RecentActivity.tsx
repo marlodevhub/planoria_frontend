@@ -1,5 +1,8 @@
 // features/dashboard/components/RecentActivity.tsx
 
+import { cn } from "@/lib/utils";
+
+// ─── Tipos ──────────────────────────────────────────────
 interface ActivityItem {
   id: string;
   description: string;
@@ -7,7 +10,7 @@ interface ActivityItem {
   type: "quiz" | "set" | "flashcard" | "other";
 }
 
-// Replace with real data from your store/API
+// ─── Datos mock (reemplazar con datos reales) ──────────
 const ACTIVITY: ActivityItem[] = [
   {
     id: "1",
@@ -53,50 +56,96 @@ const ACTIVITY: ActivityItem[] = [
   },
 ];
 
-const TYPE_ICON: Record<ActivityItem["type"], string> = {
-  quiz: "📝",
-  set: "📚",
-  flashcard: "🃏",
-  other: "📌",
+// ─── Configuración de tipos ─────────────────────────────
+const TYPE_CONFIG: Record<
+  ActivityItem["type"],
+  { icon: string; hoverClass: string }
+> = {
+  quiz: {
+    icon: "📝",
+    hoverClass: "hover:bg-primary/5 hover:border-primary/30",
+  },
+  set: {
+    icon: "📚",
+    hoverClass: "hover:bg-secondary/10 hover:border-secondary/30",
+  },
+  flashcard: {
+    icon: "🃏",
+    hoverClass: "hover:bg-accent/5 hover:border-accent/30",
+  },
+  other: {
+    icon: "📌",
+    hoverClass: "hover:bg-muted/10 hover:border-muted/30",
+  },
 };
 
-// Usando tus colores para los hover de cada tipo
-const TYPE_HOVER: Record<ActivityItem["type"], string> = {
-  quiz: "hover:bg-accent/10 hover:border-accent/30",
-  set: "hover:bg-primary/10 hover:border-primary/30",
-  flashcard: "hover:bg-secondary/10 hover:border-secondary/30",
-  other: "hover:bg-muted/10 hover:border-muted/30",
-};
-
+// ─── Componente ──────────────────────────────────────────
 export function RecentActivity() {
   return (
-    <div className="bg-white border border-border rounded-2xl p-6 space-y-4 hover:border-accent/30 transition-all duration-300 shadow-sm">
-      <h2 className="text-text font-semibold text-base flex items-center gap-2">
-        🕐 Actividad reciente
-      </h2>
-      <div className="space-y-1">
-        {ACTIVITY.map((item) => (
-          <div
-            key={item.id}
-            className={`
-              flex items-start justify-between gap-3 py-2.5 px-3 rounded-xl 
-              border border-transparent transition-all duration-200
-              ${TYPE_HOVER[item.type]}
-            `}
-          >
-            <div className="flex items-start gap-2.5 min-w-0">
-              <span className="text-sm mt-0.5 shrink-0">
-                {TYPE_ICON[item.type]}
+    <div className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-sm transition-all duration-300 hover:border-primary/20 hover:shadow-md">
+      {/* ─── Header ─── */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <i
+            className="ti ti-clock text-primary text-[18px]"
+            aria-hidden="true"
+          />
+          <h2 className="text-foreground font-semibold text-base">
+            Actividad reciente
+          </h2>
+        </div>
+        <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">
+          {ACTIVITY.length}
+        </span>
+      </div>
+
+      {/* ─── Lista de actividades ─── */}
+      <div className="divide-y divide-border/50">
+        {ACTIVITY.map((item) => {
+          const config = TYPE_CONFIG[item.type];
+          return (
+            <div
+              key={item.id}
+              className={cn(
+                "group flex items-start justify-between gap-3 py-2.5 px-2 -mx-2 rounded-lg",
+                "border border-transparent transition-all duration-200 cursor-default",
+                config.hoverClass,
+              )}
+            >
+              {/* ─── Icono y descripción ─── */}
+              <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                <span
+                  className="text-sm mt-0.5 shrink-0 transition-transform duration-200 group-hover:scale-110"
+                  role="img"
+                  aria-hidden="true"
+                >
+                  {config.icon}
+                </span>
+                <p className="text-foreground text-sm truncate group-hover:text-primary transition-colors duration-200">
+                  {item.description}
+                </p>
+              </div>
+
+              {/* ─── Tiempo ─── */}
+              <span className="text-muted-foreground text-xs shrink-0 whitespace-nowrap bg-muted/30 px-2 py-0.5 rounded-full">
+                {item.timeAgo}
               </span>
-              <p className="text-text text-sm truncate group-hover:text-accent transition-colors">
-                {item.description}
-              </p>
             </div>
-            <span className="text-muted-foreground text-xs shrink-0 whitespace-nowrap bg-bg/50 px-2 py-0.5 rounded-full">
-              {item.timeAgo}
-            </span>
-          </div>
-        ))}
+          );
+        })}
+      </div>
+
+      {/* ─── Footer ─── */}
+      <div className="pt-2 border-t border-border/50">
+        <button
+          className="text-xs text-primary hover:text-primary/80 transition-colors duration-200 flex items-center gap-1"
+          onClick={() => {
+            /* TODO: Ver todas las actividades */
+          }}
+        >
+          Ver todas las actividades
+          <i className="ti ti-arrow-right text-[12px]" aria-hidden="true" />
+        </button>
       </div>
     </div>
   );
