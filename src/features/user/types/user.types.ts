@@ -2,7 +2,7 @@ export interface UserProfile {
   id: number
   email: string
   fullName: string
-  avatarUrl: string | null
+  avatar: string | null
   role: string
   isActive: boolean
   createdAt: string
@@ -10,9 +10,10 @@ export interface UserProfile {
 }
 
 export interface UpdateProfileDto {
-  fullName?: string
-  email?: string
-  avatarUrl?: string | null
+  fullName: string
+  bio?: string
+  avatar?: string
+  timezone?: string
 }
 
 export interface UserPreferences {

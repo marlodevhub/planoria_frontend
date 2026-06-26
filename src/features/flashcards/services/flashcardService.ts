@@ -15,8 +15,14 @@ import type {
   PaginatedFlashcards,
   SearchFlashcardsDto,
   ImportFlashcardsDto,
+  ReorderCardsDto,
   FlashcardProgress,
   DeckMastery,
+  BulkCreateFlashcardsDto,
+  BulkUpdateFlashcardsDto,
+  CourseFlashcardProgress,
+  DeckPredictions,
+  DeckTimeline,
 } from "../types/flashcard.types";
 
 interface BackendFlashcardResponse {
@@ -62,7 +68,6 @@ export const flashcardService = {
     const { data } = await api.post<UploadFileResponse>(
       FLASHCARD_API_ROUTES.UPLOAD_FILE,
       formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
     );
     return data;
   },
@@ -99,9 +104,13 @@ export const flashcardService = {
     await api.delete(FLASHCARD_API_ROUTES.DELETE_DECK(id));
   },
 
-  async copyDeck(id: number): Promise<DeckDetail> {
-    const { data } = await api.post<DeckDetail>(FLASHCARD_API_ROUTES.COPY_DECK(id));
+  async duplicateDeck(id: number): Promise<DeckDetail> {
+    const { data } = await api.post<DeckDetail>(FLASHCARD_API_ROUTES.DUPLICATE_DECK(id));
     return data;
+  },
+
+  async reorderCards(deckId: number, dto: ReorderCardsDto): Promise<void> {
+    await api.put(FLASHCARD_API_ROUTES.REORDER_CARDS(deckId), dto);
   },
 
   async getCardsByDeck(deckId: number, page = 1, pageSize = 50): Promise<PaginatedFlashcards> {
@@ -160,13 +169,49 @@ export const flashcardService = {
     await api.post(FLASHCARD_API_ROUTES.BULK_DELETE_CARDS, { ids });
   },
 
-  async importFromFile(deckId: number, file: File): Promise<void> {
+  async getAllCards(page = 1, pageSize = 50): Promise<PaginatedFlashcards> {
+    const res = await api.get<BackendFlashcardResponse[]>(
+      FLASHCARD_API_ROUTES.ALL_CARDS,
+      { params: { page, pageSize } },
+    );
+    const items = (res.data ?? []).map(mapFlashcard);
+    return {
+      items,
+      totalCount: items.length,
+      page,
+      pageSize,
+      hasNextPage: false,
+    };
+  },
+
+  async bulkCreateCards(deckId: number, dto: BulkCreateFlashcardsDto): Promise<Flashcard[]> {
+    const { data } = await api.post<BackendFlashcardResponse[]>(
+      FLASHCARD_API_ROUTES.BULK_CREATE_CARDS,
+      { ...dto, deckId },
+    );
+    return (data ?? []).map(mapFlashcard);
+  },
+
+  async bulkUpdateCards(dto: BulkUpdateFlashcardsDto): Promise<Flashcard[]> {
+    const { data } = await api.put<BackendFlashcardResponse[]>(
+      FLASHCARD_API_ROUTES.BULK_UPDATE_CARDS,
+      dto,
+    );
+    return (data ?? []).map(mapFlashcard);
+  },
+
+  async importCsv(deckId: number, file: File): Promise<void> {
     const formData = new FormData();
     formData.append("deckId", String(deckId));
     formData.append("file", file);
-    await api.post(FLASHCARD_API_ROUTES.IMPORT_FILE, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    await api.post(FLASHCARD_API_ROUTES.IMPORT_CSV, formData);
+  },
+
+  async importJson(deckId: number, file: File): Promise<void> {
+    const formData = new FormData();
+    formData.append("deckId", String(deckId));
+    formData.append("file", file);
+    await api.post(FLASHCARD_API_ROUTES.IMPORT_JSON, formData);
   },
 
   async importFromText(dto: ImportFlashcardsDto): Promise<void> {
@@ -183,6 +228,27 @@ export const flashcardService = {
   async getFlashcardProgress(deckId: number): Promise<FlashcardProgress> {
     const { data } = await api.get<FlashcardProgress>(
       FLASHCARD_API_ROUTES.FLASHCARD_PROGRESS(deckId),
+    );
+    return data;
+  },
+
+  async getCourseFlashcardProgress(courseId: number): Promise<CourseFlashcardProgress> {
+    const { data } = await api.get<CourseFlashcardProgress>(
+      FLASHCARD_API_ROUTES.FLASHCARD_PROGRESS_COURSE(courseId),
+    );
+    return data;
+  },
+
+  async getDeckPredictions(deckId: number): Promise<DeckPredictions> {
+    const { data } = await api.get<DeckPredictions>(
+      FLASHCARD_API_ROUTES.FLASHCARD_PREDICTIONS(deckId),
+    );
+    return data;
+  },
+
+  async getDeckTimeline(deckId: number): Promise<DeckTimeline> {
+    const { data } = await api.get<DeckTimeline>(
+      FLASHCARD_API_ROUTES.FLASHCARD_TIMELINE(deckId),
     );
     return data;
   },

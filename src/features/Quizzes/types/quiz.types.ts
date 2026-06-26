@@ -163,3 +163,121 @@ export interface QuizWeakTopics {
   quizId: number
   topics: { questionId: number; text: string; timesWrong: number; totalAttempts: number }[]
 }
+
+export interface ReorderQuestionsDto {
+  questionIds: number[]
+}
+
+export interface CreateOptionDto {
+  texto: string
+  esCorrecta: boolean
+  orden: number
+}
+
+export interface UpdateOptionDto {
+  texto?: string
+  esCorrecta?: boolean
+  orden?: number
+}
+
+export interface UpdateQuizSettingsDto {
+  mostrarResultados?: boolean
+  permitirReintentos?: boolean
+  maxIntentos?: number
+  tiempoPorPregunta?: number
+}
+
+export interface SimulateRequest {
+  respuestas: { preguntaId: number; opcionId: number }[]
+}
+
+export interface SimulateResponse {
+  puntuacion: number
+  puntuacionTotal: number
+  porcentaje: number
+  respuestas: { preguntaId: number; opcionId: number; esCorrecta: boolean }[]
+}
+
+export interface SubmitAnswerDto {
+  attemptId: number
+  preguntaId: number
+  opcionId: number
+  tiempoMs?: number
+}
+
+export interface UpdateAnswerDto {
+  answerId: number
+  opcionId: number
+}
+
+export interface BulkAnswersDto {
+  attemptId: number
+  respuestas: { preguntaId: number; opcionId: number }[]
+}
+
+export interface GradeResponse {
+  attemptId: number
+  puntuacion: number
+  puntuacionTotal: number
+  porcentaje: number
+  respuestas: AnswerResult[]
+}
+
+export interface QuizAttemptHistory {
+  id: number
+  quizId: number
+  quizTitle: string
+  puntuacion: number
+  puntuacionTotal: number
+  porcentaje: number
+  fechaInicio: string
+  fechaFin: string
+  completado: boolean
+}
+
+export interface QuizAttemptBest {
+  id: number
+  quizId: number
+  puntuacion: number
+  puntuacionTotal: number
+  porcentaje: number
+  fechaCompletado: string
+}
+
+export interface AttemptCompareItem {
+  attemptId: number
+  usuario: string
+  puntuacion: number
+  puntuacionTotal: number
+  porcentaje: number
+  fechaCompletado: string
+}
+
+export interface QuizImprovement {
+  quizId: number
+  previousAverage: number
+  currentAverage: number
+  change: number
+  attemptsCount: number
+}
+
+export interface QuizAverage {
+  overallAverage: number
+  totalQuizzes: number
+  totalAttempts: number
+}
+
+export interface CourseComparisonItem {
+  courseId: number
+  courseName: string
+  averageScore: number
+  quizzesCount: number
+  totalAttempts: number
+}
+
+export interface TimeframeComparisonItem {
+  timeframe: string
+  averageScore: number
+  quizzesCompleted: number
+  totalAttempts: number
+}

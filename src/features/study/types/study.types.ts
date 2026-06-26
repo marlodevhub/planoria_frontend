@@ -14,10 +14,21 @@ export interface StudySession {
   duration: number
 }
 
-export interface StartSessionResponse {
-  sessionId: number
-  firstCard: StudyCard | null
-  totalCards: number
+export interface CreateSessionRequest {
+  deckId: number
+  sessionType?: 'normal' | 'review' | 'cram'
+  includeCards?: number[]
+}
+
+export interface CreateSessionResponse {
+  id: number
+  deckId: number
+  deckName: string
+  startedAt: string
+  cardsReviewed: number
+  cardsKnown: number
+  cardsUnknown: number
+  performanceScore: number
 }
 
 export interface StudyCard {
@@ -30,30 +41,51 @@ export interface StudyCard {
 }
 
 export interface NextCardResponse {
-  card: StudyCard | null
+  flashcard: StudyCard
+  sessionId: number
+  current: number
+  total: number
   remainingCards: number
-  isComplete: boolean
 }
 
-export interface SubmitResultRequest {
-  cardId: number
-  quality: 1 | 2 | 3 | 4 | 5
+export interface SubmitAnswerRequest {
+  flashcardId: number
+  sessionId: number
+  knewIt: boolean
   responseTimeMs: number
 }
 
-export interface SubmitResultResponse {
+export interface SubmitAnswerResponse {
   correct: boolean
   nextReview: string
   interval: number
 }
 
-export interface CompleteSessionResponse {
-  sessionId: number
-  totalReviewed: number
-  totalCorrect: number
-  totalIncorrect: number
-  accuracy: number
+export interface EndSessionResponse {
+  id: number
+  deckId: number
+  deckName: string
+  startedAt: string
+  endedAt: string
+  cardsReviewed: number
+  cardsKnown: number
+  cardsUnknown: number
+  performanceScore: number
+}
+
+export interface SessionSummary {
+  id: number
+  deckId: number
+  deckName: string
+  courseName: string
+  startedAt: string
+  endedAt: string
   duration: number
+  totalCards: number
+  reviewedCards: number
+  correctCards: number
+  incorrectCards: number
+  accuracy: number
   xpGained: number
 }
 
@@ -61,6 +93,40 @@ export interface DueCardsInfo {
   deckId: number
   dueCount: number
   nextDue: string
+}
+
+export interface OverdueInfo {
+  deckId: number
+  deckName: string
+  overdueCount: number
+  cards: {
+    cardId: number
+    question: string
+    daysOverdue: number
+    interval: number
+  }[]
+}
+
+export interface ReviewScheduleRequest {
+  deckId: number
+  cardIds: number[]
+  scheduledDate: string
+}
+
+export interface ReviewScheduleResponse {
+  scheduledCount: number
+  scheduledDate: string
+}
+
+export interface DeckPerformance {
+  deckId: number
+  deckName: string
+  totalSessions: number
+  totalReviewed: number
+  averageAccuracy: number
+  totalStudyTime: number
+  streakDays: number
+  trend: { date: string; accuracy: number; reviewed: number }[]
 }
 
 export interface CardDetail {

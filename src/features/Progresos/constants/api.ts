@@ -22,6 +22,7 @@ export const PROGRESOS_API_ROUTES = {
   QUIZ_IMPROVEMENT: '/progress/quizzes/improvement',
   QUIZ_COMPARE: '/progress/quizzes/compare',
   QUIZ_COMPARE_COURSES: '/progress/quizzes/compare-courses',
+  QUIZ_COMPARE_TIMEFRAMES: '/progress/quizzes/compare-timeframes',
   COURSE_EXAM_PROGRESS: (courseId: number) => `/progress/exam/courses/${courseId}`,
   COURSE_READINESS: (courseId: number) => `/progress/exam/courses/${courseId}/readiness`,
   COURSE_WEAKNESSES: (courseId: number) => `/progress/exam/courses/${courseId}/weaknesses`,

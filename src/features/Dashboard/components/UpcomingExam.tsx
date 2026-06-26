@@ -45,14 +45,20 @@ export function UpcomingExam() {
 
   const examDeadlines = deadlines?.filter((d) => d.type === 'exam') ?? []
 
+  const safeDate = (val: string | null | undefined): Date | null => {
+    if (!val) return null;
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d;
+  };
+
   const courseExams: Exam[] = (courses ?? [])
     .filter((c) => c.examDate && !c.isArchived)
     .map((c) => {
-      const examDate = new Date(c.examDate + 'T00:00:00')
+      const examDate = safeDate(c.examDate + 'T00:00:00')
       const today = new Date()
       today.setHours(0, 0, 0, 0)
-      const diffTime = examDate.getTime() - today.getTime()
-      const daysUntil = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+      const diffTime = examDate ? examDate.getTime() - today.getTime() : 0
+      const daysUntil = examDate ? Math.ceil(diffTime / (1000 * 60 * 60 * 24)) : -1
       return {
         subject: c.name,
         daysUntil,
@@ -67,12 +73,12 @@ export function UpcomingExam() {
   const scheduleItems: Exam[] = (schedules ?? [])
     .filter((s) => !s.isCompleted)
     .map((s) => {
-      const sDate = new Date(s.startDateTime)
+      const sDate = safeDate(s.startDateTime)
       const today = new Date()
       today.setHours(0, 0, 0, 0)
-      sDate.setHours(0, 0, 0, 0)
-      const diffTime = sDate.getTime() - today.getTime()
-      const daysUntil = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+      if (sDate) sDate.setHours(0, 0, 0, 0)
+      const diffTime = sDate ? sDate.getTime() - today.getTime() : 0
+      const daysUntil = sDate ? Math.ceil(diffTime / (1000 * 60 * 60 * 24)) : -1
       return {
         subject: s.title,
         daysUntil,

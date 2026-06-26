@@ -94,18 +94,24 @@ export function CourseFormModal({
   const nameValue = form.watch("name");
 
   const onSubmit = (data: FormFields) => {
-    const payload = {
-      name: data.name,
-      description: data.description ?? "",
-      examDate: data.examDate ? new Date(data.examDate).toISOString() : "",
-      examTime: data.examTime ?? "",
-      colorHex: data.colorHex,
-    };
+    try {
+      const payload = {
+        name: data.name,
+        description: data.description ?? "",
+        examDate: data.examDate
+          ? (() => { try { return new Date(data.examDate).toISOString() } catch { return "" } })()
+          : "",
+        examTime: data.examTime ?? "",
+        colorHex: data.colorHex,
+      };
 
-    if (isEditing) {
-      updateCourse(payload, { onSuccess: onClose });
-    } else {
-      createCourse(payload, { onSuccess: onClose });
+      if (isEditing) {
+        updateCourse(payload, { onSuccess: onClose });
+      } else {
+        createCourse(payload, { onSuccess: onClose });
+      }
+    } catch (err) {
+      console.error("Error al enviar formulario:", err);
     }
   };
 

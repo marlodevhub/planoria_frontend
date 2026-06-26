@@ -2,8 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { GenerateFlashcardsModal } from "../components/GenerateFlashcardsModal";
+import { ReorderCardsModal } from "../components/ReorderCardsModal";
+import { AllFlashcardsModal } from "../components/AllFlashcardsModal";
 import { DeckCard } from "../components/DeckCard";
-import { useDecks } from "../hooks";
+import { useDecks, useDuplicateDeck } from "../hooks";
 import type { Deck } from "../types/flashcard.types";
 
 function DecksSkeleton() {
@@ -22,11 +24,23 @@ function DecksSkeleton() {
 
 export function FlashcardsPage() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [allCardsOpen, setAllCardsOpen] = useState(false);
+  const [reorderTarget, setReorderTarget] = useState<Deck | null>(null);
   const { data: decks, isLoading, isError } = useDecks();
+  const { mutate: duplicateDeck, isPending: isDuplicating } = useDuplicateDeck();
   const navigate = useNavigate();
 
   const handleStudy = (deck: Deck) => {
     navigate(`/workspace/flashcards/${deck.id}`);
+  };
+
+  const handleDuplicate = (deck: Deck) => {
+    if (isDuplicating) return;
+    duplicateDeck(deck.id);
+  };
+
+  const handleReorder = (deck: Deck) => {
+    setReorderTarget(deck);
   };
 
   return (
@@ -44,10 +58,16 @@ export function FlashcardsPage() {
                 : "Generá mazos desde tus archivos"}
           </p>
         </div>
-        <Button onClick={() => setModalOpen(true)} size="sm">
-          <i className="ti ti-sparkles text-[15px]" />
-          Generar mazo
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={() => setAllCardsOpen(true)} variant="ghost" size="sm">
+            <i className="ti ti-search text-[15px]" />
+            Tarjetas
+          </Button>
+          <Button onClick={() => setModalOpen(true)} size="sm">
+            <i className="ti ti-sparkles text-[15px]" />
+            Generar mazo
+          </Button>
+        </div>
       </div>
 
       {isLoading && <DecksSkeleton />}
@@ -92,7 +112,13 @@ export function FlashcardsPage() {
       {!isLoading && !isError && !!decks?.length && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {decks.map((deck) => (
-            <DeckCard key={deck.id} deck={deck} onStudy={handleStudy} />
+            <DeckCard
+              key={deck.id}
+              deck={deck}
+              onStudy={handleStudy}
+              onDuplicate={handleDuplicate}
+              onReorder={handleReorder}
+            />
           ))}
         </div>
       )}
@@ -100,6 +126,20 @@ export function FlashcardsPage() {
       <GenerateFlashcardsModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
+      />
+
+      {reorderTarget && (
+        <ReorderCardsModal
+          deckId={reorderTarget.id}
+          deckName={reorderTarget.name}
+          open={!!reorderTarget}
+          onClose={() => setReorderTarget(null)}
+        />
+      )}
+
+      <AllFlashcardsModal
+        open={allCardsOpen}
+        onClose={() => setAllCardsOpen(false)}
       />
     </div>
   );

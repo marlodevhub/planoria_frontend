@@ -145,6 +145,10 @@ export interface DeckMastery {
   estimatedDaysToMastery: number;
 }
 
+export interface ReorderCardsDto {
+  cardIds: number[];
+}
+
 export interface SearchFlashcardsDto {
   query?: string;
   deckId?: number;
@@ -153,5 +157,48 @@ export interface SearchFlashcardsDto {
   difficulty?: 'easy' | 'medium' | 'hard';
   page?: number;
   pageSize?: number;
+}
+
+export interface BulkCreateFlashcardsDto {
+  cards: CreateFlashcardDto[];
+}
+
+export interface BulkUpdateFlashcardsDto {
+  cards: UpdateFlashcardDto[];
+}
+
+export interface CourseFlashcardProgress {
+  courseId: number;
+  courseName: string;
+  totalDecks: number;
+  totalCards: number;
+  masteredCards: number;
+  masteryPercentage: number;
+  cardsReviewedToday: number;
+  averageEase: number;
+}
+
+export interface DeckPredictions {
+  deckId: number;
+  deckName: string;
+  predictedMastery: number;
+  estimatedDaysToMastery: number;
+  predictedRetentionRate: number;
+  nextWeekReviewLoad: number;
+  confidenceInterval: { lower: number; upper: number };
+}
+
+export interface DeckTimelineEntry {
+  date: string;
+  newCards: number;
+  reviewCards: number;
+  masteredCards: number;
+  cumulativeMastery: number;
+}
+
+export interface DeckTimeline {
+  deckId: number;
+  deckName: string;
+  entries: DeckTimelineEntry[];
 }
 

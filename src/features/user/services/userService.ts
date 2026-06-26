@@ -27,13 +27,16 @@ export const userService = {
 
   async updateAvatar(file: File): Promise<AvatarUploadResponse> {
     const formData = new FormData()
-    formData.append('avatar', file)
+    formData.append('file', file)
     const { data } = await api.post<AvatarUploadResponse>(
       USER_API_ROUTES.UPDATE_AVATAR,
       formData,
-      { headers: { 'Content-Type': 'multipart/form-data' } },
     )
     return data
+  },
+
+  async deleteAvatar(): Promise<void> {
+    await api.delete(USER_API_ROUTES.DELETE_AVATAR)
   },
 
   async getPreferences(): Promise<UserPreferences> {
@@ -47,6 +50,10 @@ export const userService = {
       dto,
     )
     return data
+  },
+
+  async resetPreferences(): Promise<void> {
+    await api.post(USER_API_ROUTES.RESET_PREFERENCES)
   },
 
   async getNotificationSettings(): Promise<NotificationSettings> {
@@ -66,6 +73,10 @@ export const userService = {
     return data
   },
 
+  async testNotification(): Promise<void> {
+    await api.post(USER_API_ROUTES.TEST_NOTIFICATION)
+  },
+
   async getActivity(limit = 20): Promise<UserActivity[]> {
     const { data } = await api.get<UserActivity[]>(USER_API_ROUTES.ACTIVITY, {
       params: { limit },
@@ -78,10 +89,10 @@ export const userService = {
     return data
   },
 
-  async deleteAccount(password: string): Promise<DeleteAccountResponse> {
-    const { data } = await api.post<DeleteAccountResponse>(
+  async deleteAccount(password: string, confirmationText: string): Promise<DeleteAccountResponse> {
+    const { data } = await api.delete<DeleteAccountResponse>(
       USER_API_ROUTES.DELETE_ACCOUNT,
-      { password },
+      { data: { password, confirmationText } },
     )
     return data
   },

@@ -4,9 +4,11 @@ import type { Deck } from "../types/flashcard.types";
 interface DeckCardProps {
   deck: Deck;
   onStudy: (deck: Deck) => void;
+  onDuplicate?: (deck: Deck) => void;
+  onReorder?: (deck: Deck) => void;
 }
 
-export function DeckCard({ deck, onStudy }: DeckCardProps) {
+export function DeckCard({ deck, onStudy, onDuplicate, onReorder }: DeckCardProps) {
   return (
     <Card
       onClick={() => onStudy(deck)}
@@ -31,6 +33,29 @@ export function DeckCard({ deck, onStudy }: DeckCardProps) {
             <p className="text-muted-foreground text-[11px] mt-0.5">
               {deck.courseName}
             </p>
+          </div>
+          {/* Actions */}
+          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+            {onDuplicate && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onDuplicate(deck); }}
+                className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Duplicar mazo"
+                title="Duplicar"
+              >
+                <i className="ti ti-copy text-[13px]" />
+              </button>
+            )}
+            {onReorder && deck.totalCards > 1 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onReorder(deck); }}
+                className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Reordenar tarjetas"
+                title="Reordenar"
+              >
+                <i className="ti ti-arrows-sort text-[13px]" />
+              </button>
+            )}
           </div>
         </div>
 

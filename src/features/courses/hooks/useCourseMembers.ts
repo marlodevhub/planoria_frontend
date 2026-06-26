@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { courseService } from '../services/courseService'
-import type { AddMemberDto } from '../types/course.types'
+import type { AddMemberDto, UpdateMemberRoleDto } from '../types/course.types'
 
 export function useCourseMembers(courseId: number) {
   return useQuery({
@@ -24,6 +24,17 @@ export function useRemoveMember(courseId: number) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (userId: number) => courseService.removeMember(courseId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['courses', courseId, 'members'] })
+    },
+  })
+}
+
+export function useUpdateMemberRole(courseId: number) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ userId, role }: { userId: number; role: UpdateMemberRoleDto['role'] }) =>
+      courseService.updateMemberRole(courseId, userId, { role }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['courses', courseId, 'members'] })
     },

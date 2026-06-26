@@ -165,7 +165,7 @@ export function CoursesPage() {
         course={courseDetail ?? null}
         open={modalMode === "detail" && !!courseDetail}
         onClose={closeAll}
-        onEdit={() => openEdit(courseDetail!)}
+        onEdit={() => { if (courseDetail) openEdit(courseDetail); }}
       />
       <CourseFormModal
         course={modalMode === "edit" ? (courseDetail ?? null) : null}

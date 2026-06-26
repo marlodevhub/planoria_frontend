@@ -5,6 +5,7 @@ import type {
   QuizDetail,
   Question,
   CreateQuestionDto,
+  Option,
   QuizAttempt,
   QuizResult,
   CreateQuizRequest,
@@ -16,6 +17,23 @@ import type {
   QuizComparison,
   QuizProgressDetail,
   QuizWeakTopics,
+  ReorderQuestionsDto,
+  CreateOptionDto,
+  UpdateOptionDto,
+  UpdateQuizSettingsDto,
+  SimulateRequest,
+  SimulateResponse,
+  SubmitAnswerDto,
+  UpdateAnswerDto,
+  BulkAnswersDto,
+  GradeResponse,
+  QuizAttemptHistory,
+  QuizAttemptBest,
+  AttemptCompareItem,
+  QuizImprovement,
+  QuizAverage,
+  CourseComparisonItem,
+  TimeframeComparisonItem,
 } from '../types/quiz.types'
 
 interface BackendQuizListItem {
@@ -159,9 +177,59 @@ export const quizService = {
 
   async getCourseQuizzes(courseId: number): Promise<QuizListItem[]> {
     const { data } = await api.get<BackendQuizListItem[]>(
-      QUIZ_API_ROUTES.COURSE_QUIZZES(courseId),
+      QUIZ_API_ROUTES.COURSE_QUIZZES,
+      { params: { courseId } },
     )
     return (data ?? []).map(mapQuizListItem)
+  },
+
+  async duplicateQuiz(id: number): Promise<QuizDetail> {
+    const { data } = await api.post<QuizDetail>(QUIZ_API_ROUTES.DUPLICATE_QUIZ(id))
+    return data
+  },
+
+  async reorderQuestions(quizId: number, dto: ReorderQuestionsDto): Promise<void> {
+    await api.put(QUIZ_API_ROUTES.REORDER_QUESTIONS(quizId), dto)
+  },
+
+  async createOption(quizId: number, questionId: number, dto: CreateOptionDto): Promise<Option> {
+    const { data } = await api.post<Option>(
+      QUIZ_API_ROUTES.CREATE_OPTION(quizId, questionId),
+      dto,
+    )
+    return data
+  },
+
+  async updateOption(quizId: number, questionId: number, optionId: number, dto: UpdateOptionDto): Promise<Option> {
+    const { data } = await api.put<Option>(
+      QUIZ_API_ROUTES.UPDATE_OPTION(quizId, questionId, optionId),
+      dto,
+    )
+    return data
+  },
+
+  async deleteOption(quizId: number, questionId: number, optionId: number): Promise<void> {
+    await api.delete(QUIZ_API_ROUTES.DELETE_OPTION(quizId, questionId, optionId))
+  },
+
+  async updateSettings(id: number, dto: UpdateQuizSettingsDto): Promise<QuizSettings> {
+    const { data } = await api.put<QuizSettings>(QUIZ_API_ROUTES.SETTINGS(id), dto)
+    return data
+  },
+
+  async resetSettings(id: number): Promise<QuizSettings> {
+    const { data } = await api.post<QuizSettings>(QUIZ_API_ROUTES.SETTINGS_RESET(id))
+    return data
+  },
+
+  async getPreview(id: number): Promise<QuizDetail> {
+    const { data } = await api.get<QuizDetail>(QUIZ_API_ROUTES.PREVIEW(id))
+    return data
+  },
+
+  async simulate(id: number, dto: SimulateRequest): Promise<SimulateResponse> {
+    const { data } = await api.post<SimulateResponse>(QUIZ_API_ROUTES.SIMULATE(id), dto)
+    return data
   },
 
   async create(req: CreateQuizRequest): Promise<QuizDetail> {
@@ -188,7 +256,7 @@ export const quizService = {
 
   async startAttempt(quizId: number): Promise<StartAttemptResponse> {
     const { data } = await api.post<BackendAttempt>(
-      QUIZ_API_ROUTES.BASE_ATTEMPTS + '/start',
+      QUIZ_API_ROUTES.START_ATTEMPT,
       { quizId },
     )
     const preguntas = await this.getQuestions(quizId)
@@ -234,7 +302,54 @@ export const quizService = {
 
   async getMyAttempts(quizId: number): Promise<QuizAttempt[]> {
     const { data } = await api.get<QuizAttempt[]>(
-      QUIZ_API_ROUTES.MY_ATTEMPTS(quizId),
+      QUIZ_API_ROUTES.MY_ATTEMPTS,
+      { params: { quizId } },
+    )
+    return data
+  },
+
+  async submitAnswer(dto: SubmitAnswerDto): Promise<void> {
+    await api.post(QUIZ_API_ROUTES.ANSWER, dto)
+  },
+
+  async updateAnswer(dto: UpdateAnswerDto): Promise<void> {
+    await api.put(QUIZ_API_ROUTES.ANSWER, dto)
+  },
+
+  async submitBulkAnswers(dto: BulkAnswersDto): Promise<void> {
+    await api.post(QUIZ_API_ROUTES.ANSWERS_BULK, dto)
+  },
+
+  async gradeAttempt(attemptId: number): Promise<GradeResponse> {
+    const { data } = await api.post<GradeResponse>(QUIZ_API_ROUTES.GRADE(attemptId))
+    return data
+  },
+
+  async regradeAttempt(attemptId: number): Promise<GradeResponse> {
+    const { data } = await api.post<GradeResponse>(QUIZ_API_ROUTES.REGRADE(attemptId))
+    return data
+  },
+
+  async getAttemptHistory(quizId: number): Promise<QuizAttemptHistory[]> {
+    const { data } = await api.get<QuizAttemptHistory[]>(
+      QUIZ_API_ROUTES.HISTORY,
+      { params: { quizId } },
+    )
+    return data
+  },
+
+  async getBestAttempt(quizId: number): Promise<QuizAttemptBest> {
+    const { data } = await api.get<QuizAttemptBest>(
+      QUIZ_API_ROUTES.BEST,
+      { params: { quizId } },
+    )
+    return data
+  },
+
+  async compareAttempts(ids: number[]): Promise<AttemptCompareItem[]> {
+    const { data } = await api.get<AttemptCompareItem[]>(
+      QUIZ_API_ROUTES.COMPARE,
+      { params: { ids: ids.join(',') } },
     )
     return data
   },
@@ -253,17 +368,41 @@ export const quizService = {
     return data
   },
 
-  async getQuizComparison(quizId: number): Promise<QuizComparison> {
+  async getQuizComparison(quizId1: number, quizId2: number): Promise<QuizComparison> {
     const { data } = await api.get<QuizComparison>(
-      QUIZ_API_ROUTES.QUIZ_PROGRESS_COMPARE(quizId),
+      QUIZ_API_ROUTES.QUIZ_PROGRESS_COMPARE,
+      { params: { quizId1, quizId2 } },
     )
     return data
   },
 
-  async getQuizWeakTopics(quizId: number): Promise<QuizWeakTopics> {
+  async getQuizWeakTopics(courseId: number): Promise<QuizWeakTopics> {
     const { data } = await api.get<QuizWeakTopics>(
-      QUIZ_API_ROUTES.QUIZ_PROGRESS_WEAK(quizId),
+      QUIZ_API_ROUTES.QUIZ_PROGRESS_WEAK(courseId),
     )
+    return data
+  },
+
+  async getQuizImprovement(quizId: number): Promise<QuizImprovement> {
+    const { data } = await api.get<QuizImprovement>(
+      QUIZ_API_ROUTES.QUIZ_PROGRESS_IMPROVEMENT,
+      { params: { quizId } },
+    )
+    return data
+  },
+
+  async getQuizAverage(): Promise<QuizAverage> {
+    const { data } = await api.get<QuizAverage>(QUIZ_API_ROUTES.QUIZ_AVERAGE)
+    return data
+  },
+
+  async getCompareCourses(): Promise<CourseComparisonItem[]> {
+    const { data } = await api.get<CourseComparisonItem[]>(QUIZ_API_ROUTES.QUIZ_COMPARE_COURSES)
+    return data
+  },
+
+  async getCompareTimeframes(): Promise<TimeframeComparisonItem[]> {
+    const { data } = await api.get<TimeframeComparisonItem[]>(QUIZ_API_ROUTES.QUIZ_COMPARE_TIMEFRAMES)
     return data
   },
 

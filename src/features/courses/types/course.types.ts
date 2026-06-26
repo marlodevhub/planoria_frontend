@@ -53,6 +53,10 @@ export interface AddMemberDto {
   role: 'editor' | 'viewer'
 }
 
+export interface UpdateMemberRoleDto {
+  role: 'owner' | 'editor' | 'viewer'
+}
+
 export interface CourseExam {
   id: number
   title: string

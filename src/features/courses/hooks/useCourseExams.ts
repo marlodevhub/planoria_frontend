@@ -20,10 +20,10 @@ export function useCreateExam(courseId: number) {
   })
 }
 
-export function useUpdateExam(courseId: number, examId: number) {
+export function useUpdateExam(courseId: number) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (dto: UpdateExamDto) =>
+    mutationFn: ({ examId, ...dto }: UpdateExamDto & { examId: number }) =>
       courseService.updateExam(courseId, examId, dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['courses', courseId, 'exams'] })

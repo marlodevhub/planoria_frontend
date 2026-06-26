@@ -7,6 +7,7 @@ import type {
   UpdateCourseDto,
   CourseMember,
   AddMemberDto,
+  UpdateMemberRoleDto,
   CourseExam,
   CreateExamDto,
   UpdateExamDto,
@@ -75,6 +76,18 @@ export const courseService = {
     await api.delete(COURSE_API_ROUTES.MEMBER_BY_ID(courseId, userId));
   },
 
+  async updateMemberRole(
+    courseId: number,
+    userId: number,
+    dto: UpdateMemberRoleDto,
+  ): Promise<CourseMember> {
+    const { data } = await api.put<CourseMember>(
+      COURSE_API_ROUTES.MEMBER_ROLE(courseId, userId),
+      dto,
+    );
+    return data;
+  },
+
   async getExams(courseId: number): Promise<CourseExam[]> {
     const { data } = await api.get<CourseExam[]>(
       COURSE_API_ROUTES.EXAMS(courseId),
@@ -96,14 +109,16 @@ export const courseService = {
     dto: UpdateExamDto,
   ): Promise<CourseExam> {
     const { data } = await api.put<CourseExam>(
-      COURSE_API_ROUTES.EXAM_BY_ID(courseId, examId),
-      dto,
+      COURSE_API_ROUTES.EXAMS(courseId),
+      { ...dto, examId },
     );
     return data;
   },
 
   async deleteExam(courseId: number, examId: number): Promise<void> {
-    await api.delete(COURSE_API_ROUTES.EXAM_BY_ID(courseId, examId));
+    await api.delete(COURSE_API_ROUTES.EXAMS(courseId), {
+      params: { examId },
+    });
   },
 
   async getStats(courseId: number): Promise<CourseStats> {

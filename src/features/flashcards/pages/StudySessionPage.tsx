@@ -69,11 +69,13 @@ export function StudySessionPage() {
   } = useStudySession()
   const [flipped, setFlipped] = useState(false)
 
+  const numDeckId = Number(deckId) || 0
+
   useEffect(() => {
-    if (deckId) {
-      startSession(Number(deckId))
+    if (numDeckId) {
+      startSession(numDeckId)
     }
-  }, [deckId])
+  }, [numDeckId])
 
   useEffect(() => {
     setFlipped(false)
@@ -171,7 +173,24 @@ export function StudySessionPage() {
     )
   }
 
-  if (!currentCard) return null
+  if (!currentCard) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="space-y-4 text-center">
+          <div className="h-14 w-14 rounded-2xl bg-muted flex items-center justify-center mx-auto">
+            <i className="ti ti-cards text-2xl text-muted-foreground" />
+          </div>
+          <p className="font-semibold text-foreground">No hay tarjetas para estudiar</p>
+          <p className="text-muted-foreground text-sm max-w-[220px]">
+            Este mazo no tiene tarjetas disponibles para estudiar en este momento.
+          </p>
+          <Button variant="outline" onClick={() => navigate('/workspace/flashcards')}>
+            Volver a mazos
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   const progressPct = currentCard.total > 0
     ? Math.round(((currentCard.current - 1) / currentCard.total) * 100)

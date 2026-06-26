@@ -69,8 +69,8 @@ export function CronogramaPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
 
-  const { data: monthDays, isLoading } = useMonthView(viewingYear, viewingMonth + 1)
-  const { data: daySchedules, isLoading: dayLoading } = useDayView(selectedDate ?? '')
+  const { data: monthDays, isLoading, isError: monthError } = useMonthView(viewingYear, viewingMonth + 1)
+  const { data: daySchedules, isLoading: dayLoading, isError: dayError } = useDayView(selectedDate ?? '')
   const { data: courses } = useCourses()
 
   const courseColorMap = useMemo(() => {
@@ -248,7 +248,9 @@ export function CronogramaPage() {
                 ? Array.from({ length: 35 }).map((_, i) => (
                     <div key={i} className="aspect-square rounded-lg bg-muted animate-pulse" />
                   ))
-                : monthGrid.grid.map((day, i) => (
+                : monthError
+                  ? <div className="col-span-7 text-center py-8 text-muted-foreground text-sm">Error al cargar el mes. Intentá de nuevo.</div>
+                  : monthGrid.grid.map((day, i) => (
                     <button
                       key={i}
                       onClick={() => day && handleDayClick(day.date)}
@@ -294,6 +296,8 @@ export function CronogramaPage() {
                   <div key={i} className="h-16 rounded-xl bg-muted animate-pulse" />
                 ))}
               </div>
+            ) : dayError ? (
+              <p className="text-destructive text-sm">Error al cargar horarios del día.</p>
             ) : !selectedDate ? (
               <p className="text-muted-foreground text-sm">Haz clic en un día del calendario para ver los horarios.</p>
             ) : daySchedules && daySchedules.length > 0 ? (
@@ -371,7 +375,7 @@ export function CronogramaPage() {
                             <div className="flex items-center gap-2">
                               <div className="h-2 w-2 rounded-full" style={{ backgroundColor: course.colorHex }} />
                               {course.name}
-                              {course.examDate && ` (${new Date(course.examDate).toLocaleDateString()})`}
+                              {course.examDate && (() => { try { return ` (${new Date(course.examDate).toLocaleDateString()})` } catch { return '' } })()}
                             </div>
                           </SelectItem>
                         ))}

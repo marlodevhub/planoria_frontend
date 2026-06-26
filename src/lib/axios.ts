@@ -18,7 +18,6 @@ import { errorResponseInterceptor } from '@/lib/errorInterceptor'
 const api = axios.create({
     baseURL: env.apiUrl,
     timeout: 15000,
-    headers: { 'Content-Type': 'application/json' },
 })
 
 /**

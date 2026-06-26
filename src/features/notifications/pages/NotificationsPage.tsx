@@ -13,6 +13,7 @@ const typeStyles: Record<string, string> = {
 
 function formatTime(iso: string) {
   const d = new Date(iso)
+  if (isNaN(d.getTime())) return iso
   const now = new Date()
   const diffMs = now.getTime() - d.getTime()
   const diffMin = Math.floor(diffMs / 60000)

@@ -49,7 +49,8 @@ export function useStudySession() {
   const fetchNextCard = async (sid: number) => {
     try {
       const next = await flashcardService.getNextCard(sid)
-      if (!next.flashcard) {
+      if (!next.flashcard || next.remainingCards <= 0) {
+        setCurrentCard(null)
         setIsFinished(true)
         await fetchResult(sid)
         return

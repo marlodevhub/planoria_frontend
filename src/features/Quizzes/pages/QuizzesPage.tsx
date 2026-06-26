@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { useQuizzes } from '../hooks'
+import { useQuizzes, useDuplicateQuiz } from '../hooks'
 import { useCourses } from '@/features/courses/hooks'
 import { TakeQuizModal } from '../components/TakeQuizModal'
 import { GenerateQuizModal } from '../components/GenerateQuizModal'
+import { QuizSettingsModal } from '../components/QuizSettingsModal'
+import { QuizPreviewModal } from '../components/QuizPreviewModal'
+import { QuizAttemptHistoryModal } from '../components/QuizAttemptHistoryModal'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import type { QuizListItem } from '../types/quiz.types'
 
 function QuizzesSkeleton() {
@@ -25,8 +27,17 @@ function QuizzesSkeleton() {
 export function QuizzesPage() {
   const { data: quizzes, isLoading, isError } = useQuizzes()
   const { data: courses } = useCourses()
+  const { mutate: duplicateQuiz, isPending: isDuplicating } = useDuplicateQuiz()
   const [selectedQuiz, setSelectedQuiz] = useState<QuizListItem | null>(null)
   const [showGenerateModal, setShowGenerateModal] = useState(false)
+  const [settingsTarget, setSettingsTarget] = useState<QuizListItem | null>(null)
+  const [previewTarget, setPreviewTarget] = useState<QuizListItem | null>(null)
+  const [historyTarget, setHistoryTarget] = useState<QuizListItem | null>(null)
+
+  const handleDuplicate = (quiz: QuizListItem) => {
+    if (isDuplicating) return
+    duplicateQuiz(quiz.id)
+  }
 
   const courseColors = new Map(
     courses?.filter((c) => !c.isArchived).map((c) => [c.name, c.colorHex]) ?? [],
@@ -112,6 +123,40 @@ export function QuizzesPage() {
                         <p className="text-muted-foreground text-[11px] mt-0.5">{quiz.cursoNombre}</p>
                       )}
                     </div>
+                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setPreviewTarget(quiz); }}
+                        className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                        aria-label="Vista previa"
+                        title="Vista previa"
+                      >
+                        <i className="ti ti-eye text-[13px]" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setHistoryTarget(quiz); }}
+                        className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                        aria-label="Historial"
+                        title="Historial"
+                      >
+                        <i className="ti ti-history text-[13px]" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSettingsTarget(quiz); }}
+                        className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                        aria-label="Configuración"
+                        title="Configuración"
+                      >
+                        <i className="ti ti-settings text-[13px]" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDuplicate(quiz); }}
+                        className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                        aria-label="Duplicar quiz"
+                        title="Duplicar"
+                      >
+                        <i className="ti ti-copy text-[13px]" />
+                      </button>
+                    </div>
                   </div>
 
                   <p className="text-muted-foreground text-xs line-clamp-2 leading-relaxed">
@@ -151,6 +196,32 @@ export function QuizzesPage() {
 
       {selectedQuiz && (
         <TakeQuizModal quiz={selectedQuiz} onClose={() => setSelectedQuiz(null)} />
+      )}
+
+      {settingsTarget && (
+        <QuizSettingsModal
+          quizId={settingsTarget.id}
+          open={!!settingsTarget}
+          onClose={() => setSettingsTarget(null)}
+        />
+      )}
+
+      {previewTarget && (
+        <QuizPreviewModal
+          quizId={previewTarget.id}
+          quizTitle={previewTarget.titulo}
+          open={!!previewTarget}
+          onClose={() => setPreviewTarget(null)}
+        />
+      )}
+
+      {historyTarget && (
+        <QuizAttemptHistoryModal
+          quizId={historyTarget.id}
+          quizTitle={historyTarget.titulo}
+          open={!!historyTarget}
+          onClose={() => setHistoryTarget(null)}
+        />
       )}
     </div>
   )
