@@ -1,6 +1,16 @@
 // features/dashboard/components/RecentActivity.tsx
 
-import { cn } from "@/lib/utils";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Clock, FileText, Book, Layers, Pin, ArrowRight } from "lucide-react";
 
 // ─── Tipos ──────────────────────────────────────────────
 interface ActivityItem {
@@ -10,7 +20,7 @@ interface ActivityItem {
   type: "quiz" | "set" | "flashcard" | "other";
 }
 
-// ─── Datos mock (reemplazar con datos reales) ──────────
+// ─── Datos mock ──────────────────────────────────────────
 const ACTIVITY: ActivityItem[] = [
   {
     id: "1",
@@ -59,94 +69,92 @@ const ACTIVITY: ActivityItem[] = [
 // ─── Configuración de tipos ─────────────────────────────
 const TYPE_CONFIG: Record<
   ActivityItem["type"],
-  { icon: string; hoverClass: string }
+  { icon: React.ReactNode; iconBg: string; iconColor: string }
 > = {
   quiz: {
-    icon: "📝",
-    hoverClass: "hover:bg-primary/5 hover:border-primary/30",
+    icon: <FileText className="h-4 w-4" />,
+    iconBg: "bg-primary/10",
+    iconColor: "text-primary",
   },
   set: {
-    icon: "📚",
-    hoverClass: "hover:bg-secondary/10 hover:border-secondary/30",
+    icon: <Book className="h-4 w-4" />,
+    iconBg: "bg-secondary/10",
+    iconColor: "text-secondary",
   },
   flashcard: {
-    icon: "🃏",
-    hoverClass: "hover:bg-accent/5 hover:border-accent/30",
+    icon: <Layers className="h-4 w-4" />,
+    iconBg: "bg-accent/10",
+    iconColor: "text-accent",
   },
   other: {
-    icon: "📌",
-    hoverClass: "hover:bg-muted/10 hover:border-muted/30",
+    icon: <Pin className="h-4 w-4" />,
+    iconBg: "bg-muted/10",
+    iconColor: "text-muted-foreground",
   },
 };
 
 // ─── Componente ──────────────────────────────────────────
 export function RecentActivity() {
   return (
-    <div className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-sm transition-all duration-300 hover:border-primary/20 hover:shadow-md">
+    <Card className="transition-all duration-300 hover:border-primary/20 hover:shadow-md">
       {/* ─── Header ─── */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <i
-            className="ti ti-clock text-primary text-[18px]"
-            aria-hidden="true"
-          />
-          <h2 className="text-foreground font-semibold text-base">
-            Actividad reciente
-          </h2>
-        </div>
-        <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-base font-semibold flex items-center gap-2">
+          <Clock className="h-4 w-4 text-primary" />
+          Actividad reciente
+        </CardTitle>
+        <Badge variant="secondary" className="text-xs">
           {ACTIVITY.length}
-        </span>
-      </div>
+        </Badge>
+      </CardHeader>
 
       {/* ─── Lista de actividades ─── */}
-      <div className="divide-y divide-border/50">
-        {ACTIVITY.map((item) => {
+      <CardContent className="space-y-1">
+        {ACTIVITY.map((item, index) => {
           const config = TYPE_CONFIG[item.type];
           return (
-            <div
-              key={item.id}
-              className={cn(
-                "group flex items-start justify-between gap-3 py-2.5 px-2 -mx-2 rounded-lg",
-                "border border-transparent transition-all duration-200 cursor-default",
-                config.hoverClass,
-              )}
-            >
-              {/* ─── Icono y descripción ─── */}
-              <div className="flex items-start gap-2.5 min-w-0 flex-1">
-                <span
-                  className="text-sm mt-0.5 shrink-0 transition-transform duration-200 group-hover:scale-110"
-                  role="img"
-                  aria-hidden="true"
-                >
-                  {config.icon}
-                </span>
-                <p className="text-foreground text-sm truncate group-hover:text-primary transition-colors duration-200">
-                  {item.description}
-                </p>
-              </div>
+            <div key={item.id}>
+              <div className="group flex items-center justify-between gap-3 py-2.5 px-2 -mx-2 rounded-lg transition-all duration-200 hover:bg-muted/50 cursor-default">
+                {/* ─── Icono y descripción ─── */}
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div
+                    className={`p-1 rounded-md shrink-0 ${config.iconBg} ${config.iconColor}`}
+                  >
+                    {config.icon}
+                  </div>
+                  <p className="text-sm truncate group-hover:text-primary transition-colors duration-200">
+                    {item.description}
+                  </p>
+                </div>
 
-              {/* ─── Tiempo ─── */}
-              <span className="text-muted-foreground text-xs shrink-0 whitespace-nowrap bg-muted/30 px-2 py-0.5 rounded-full">
-                {item.timeAgo}
-              </span>
+                {/* ─── Tiempo ─── */}
+                <Badge
+                  variant="outline"
+                  className="text-xs whitespace-nowrap shrink-0"
+                >
+                  {item.timeAgo}
+                </Badge>
+              </div>
+              {index < ACTIVITY.length - 1 && <Separator className="my-1" />}
             </div>
           );
         })}
-      </div>
+      </CardContent>
 
       {/* ─── Footer ─── */}
-      <div className="pt-2 border-t border-border/50">
-        <button
-          className="text-xs text-primary hover:text-primary/80 transition-colors duration-200 flex items-center gap-1"
+      <CardFooter className="border-t pt-4">
+        <Button
+          variant="link"
+          size="sm"
+          className="text-xs px-0 h-auto gap-1"
           onClick={() => {
             /* TODO: Ver todas las actividades */
           }}
         >
           Ver todas las actividades
-          <i className="ti ti-arrow-right text-[12px]" aria-hidden="true" />
-        </button>
-      </div>
-    </div>
+          <ArrowRight className="h-3 w-3" />
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }
