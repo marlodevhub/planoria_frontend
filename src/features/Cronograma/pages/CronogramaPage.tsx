@@ -1,325 +1,460 @@
-// features/cronograma/pages/CronogramaPage.tsx
+import { useState, useMemo } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useMonthView } from '../hooks/useMonthView'
+import { useDayView } from '../hooks/useDayView'
+import { useCreateSchedule } from '../hooks/useCreateSchedule'
+import { useToggleComplete } from '../hooks/useToggleComplete'
+import { useDeleteSchedule } from '../hooks/useDeleteSchedule'
+import { useCourses } from '@/features/courses/hooks'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import type { ScheduleListItem } from '../types/cronograma.types'
 
-import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { useState } from "react";
+const MONTHS = [
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+]
 
-// Datos de ejemplo - reemplazar con datos reales de tu API/store
-const EXAMS = [
-  {
-    id: 1,
-    course: "Matemáticas",
-    topic: "Álgebra Lineal",
-    date: "2026-06-20",
-    time: "09:00",
-    priority: "alta",
-  },
-  {
-    id: 2,
-    course: "Física",
-    topic: "Mecánica Clásica",
-    date: "2026-06-22",
-    time: "11:00",
-    priority: "media",
-  },
-  {
-    id: 3,
-    course: "Estadística",
-    topic: "Probabilidad",
-    date: "2026-06-25",
-    time: "15:00",
-    priority: "alta",
-  },
-  {
-    id: 4,
-    course: "Historia",
-    topic: "Edad Media",
-    date: "2026-06-28",
-    time: "10:00",
-    priority: "baja",
-  },
-  {
-    id: 5,
-    course: "Inglés",
-    topic: "Gramática Avanzada",
-    date: "2026-07-01",
-    time: "14:00",
-    priority: "media",
-  },
-];
+const DAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 
-// Estudios diarios programados
-const DAILY_STUDY = [
-  { time: "08:00", course: "Matemáticas", topic: "Álgebra Lineal" },
-  { time: "10:00", course: "Física", topic: "Mecánica Clásica" },
-  { time: "13:00", course: "Estadística", topic: "Probabilidad" },
-  { time: "15:00", course: "Historia", topic: "Edad Media" },
-  { time: "17:00", course: "Inglés", topic: "Gramática Avanzada" },
-];
+const scheduleSchema = z.object({
+  titulo: z.string().min(1, 'El título es requerido'),
+  fecha: z.string().min(1, 'Seleccioná una fecha'),
+  horaInicio: z.string().min(1, 'Seleccioná hora de inicio'),
+  horaFin: z.string().min(1, 'Seleccioná hora de fin'),
+  cursoId: z.string().default(''),
+})
 
-// Colores por curso (usando tus colores)
-const COURSE_COLORS: Record<string, string> = {
-  Matemáticas: "bg-primary text-primary-foreground",
-  Física: "bg-accent text-accent-foreground",
-  Estadística: "bg-secondary text-secondary-foreground",
-  Historia: "bg-destructive text-destructive-foreground",
-  Inglés: "bg-muted text-muted-foreground",
-};
+type ScheduleFormFields = z.infer<typeof scheduleSchema>
 
-const PRIORITY_COLORS: Record<string, string> = {
-  alta: "bg-red-500",
-  media: "bg-yellow-500",
-  baja: "bg-green-500",
-};
+function formatTime(iso: string) {
+  try { return new Date(iso).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) } catch { return iso }
+}
 
-const days = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+function formatDate(iso: string) {
+  try { return new Date(iso).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }) } catch { return iso }
+}
 
 export function CronogramaPage() {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [viewMode, setViewMode] = useState<"semana" | "mes">("semana");
+  const today = useMemo(() => new Date(), [])
+  const [viewingYear, setViewingYear] = useState(today.getFullYear())
+  const [viewingMonth, setViewingMonth] = useState(today.getMonth())
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [showCreateModal, setShowCreateModal] = useState(false)
 
-  const currentMonth = selectedDate.toLocaleString("es", { month: "long" });
-  const currentYear = selectedDate.getFullYear();
+  const { data: monthDays, isLoading, isError: monthError } = useMonthView(viewingYear, viewingMonth + 1)
+  const { data: daySchedules, isLoading: dayLoading, isError: dayError } = useDayView(selectedDate ?? '')
+  const { data: courses } = useCourses()
 
-  // Obtener día actual
-  const today = new Date().getDate();
-  const currentDay = new Date().getDay();
+  const courseColorMap = useMemo(() => {
+    const map = new Map<string, string>()
+    if (courses) {
+      for (const c of courses) {
+        map.set(c.name, c.colorHex)
+      }
+    }
+    return map
+  }, [courses])
 
-  const handlePrevWeek = () => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() - 7);
-    setSelectedDate(newDate);
-  };
+  const toggleComplete = useToggleComplete()
+  const deleteSchedule = useDeleteSchedule()
+  const createSchedule = useCreateSchedule()
 
-  const handleNextWeek = () => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() + 7);
-    setSelectedDate(newDate);
-  };
+  const form = useForm<ScheduleFormFields>({
+    resolver: zodResolver(scheduleSchema) as any,
+    defaultValues: {
+      titulo: '',
+      fecha: '',
+      horaInicio: '',
+      horaFin: '',
+      cursoId: '',
+    },
+  })
 
-  // Filtrar exámenes para la semana actual
-  const getExamsForWeek = () => {
-    const startOfWeek = new Date(selectedDate);
-    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + 1);
+  function openCreateModalWithDate(date?: string) {
+    if (date) {
+      form.setValue('fecha', date)
+    } else {
+      const y = today.getFullYear()
+      const m = String(today.getMonth() + 1).padStart(2, '0')
+      const d = String(today.getDate()).padStart(2, '0')
+      form.setValue('fecha', `${y}-${m}-${d}`)
+    }
+    form.setValue('horaInicio', '09:00')
+    form.setValue('horaFin', '10:00')
+    setShowCreateModal(true)
+  }
 
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(endOfWeek.getDate() + 6);
+  function onCourseSelect(courseId: string) {
+    form.setValue('cursoId', courseId)
+    if (!courseId) return
+    const course = courses?.find((c) => String(c.id) === courseId)
+    if (course) {
+      form.setValue('titulo', `Estudio: ${course.name}`)
+    }
+  }
 
-    return EXAMS.filter((exam) => {
-      const examDate = new Date(exam.date);
-      return examDate >= startOfWeek && examDate <= endOfWeek;
-    });
-  };
+  function onSubmit(data: ScheduleFormFields) {
+    const startDateTime = `${data.fecha}T${data.horaInicio}:00`
+    const endDateTime = `${data.fecha}T${data.horaFin}:00`
+    createSchedule.mutate(
+      {
+        title: data.titulo,
+        startDateTime,
+        endDateTime,
+        courseIds: data.cursoId ? [Number(data.cursoId)] : [],
+      },
+      {
+        onSuccess: () => {
+          setShowCreateModal(false)
+          setSelectedDate(data.fecha)
+          form.reset()
+        },
+      },
+    )
+  }
 
-  const weekExams = getExamsForWeek();
+  const selectedDateObj = selectedDate ? new Date(selectedDate + 'T00:00:00') : null
+
+  const monthGrid = useMemo(() => {
+    const firstDay = new Date(viewingYear, viewingMonth, 1)
+    const lastDay = new Date(viewingYear, viewingMonth + 1, 0)
+    const startPad = firstDay.getDay()
+    const totalSlots = startPad + lastDay.getDate()
+    const rows = Math.ceil(totalSlots / 7)
+    const grid: ({ date: Date; schedules: ScheduleListItem[] } | null)[] = []
+
+    const dayMap = new Map<string, ScheduleListItem[]>()
+    if (monthDays) {
+      for (const d of monthDays) {
+        const key = new Date(d.date).toDateString()
+        const existing = dayMap.get(key) ?? []
+        existing.push(...d.schedules)
+        dayMap.set(key, existing)
+      }
+    }
+
+    for (let i = 0; i < rows * 7; i++) {
+      const dayNum = i - startPad + 1
+      if (dayNum < 1 || dayNum > lastDay.getDate()) {
+        grid.push(null)
+      } else {
+        const date = new Date(viewingYear, viewingMonth, dayNum)
+        const key = date.toDateString()
+        const schedules = dayMap.get(key) ?? []
+        grid.push({ date, schedules })
+      }
+    }
+
+    return { grid, cols: 7 }
+  }, [viewingYear, viewingMonth, monthDays])
+
+  function prevMonth() {
+    if (viewingMonth === 0) {
+      setViewingYear((y) => y - 1)
+      setViewingMonth(11)
+    } else {
+      setViewingMonth((m) => m - 1)
+    }
+    setSelectedDate(null)
+  }
+
+  function nextMonth() {
+    if (viewingMonth === 11) {
+      setViewingYear((y) => y + 1)
+      setViewingMonth(0)
+    } else {
+      setViewingMonth((m) => m + 1)
+    }
+    setSelectedDate(null)
+  }
+
+  function handleDayClick(date: Date) {
+    const y = date.getFullYear()
+    const m = String(date.getMonth() + 1).padStart(2, '0')
+    const d = String(date.getDate()).padStart(2, '0')
+    setSelectedDate(`${y}-${m}-${d}`)
+  }
+
+  function isToday(d: Date) {
+    return d.toDateString() === today.toDateString()
+  }
 
   return (
     <div className="space-y-6 animate-fade-up">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Cronograma</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Planifica tu semana de estudio y visualiza tus exámenes
+            Gestiona tus horarios de estudio
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handlePrevWeek}
-            className="p-2 rounded-xl border border-border hover:bg-accent/10 transition-all duration-200"
-          >
-            ←
-          </button>
-          <span className="text-sm font-medium text-foreground">
-            {currentMonth} {currentYear}
-          </span>
-          <button
-            onClick={handleNextWeek}
-            className="p-2 rounded-xl border border-border hover:bg-accent/10 transition-all duration-200"
-          >
-            →
-          </button>
-        </div>
+        <Button onClick={() => openCreateModalWithDate(selectedDate ?? undefined)}>
+          <i className="ti ti-plus text-[16px] mr-1" />
+          Nuevo horario
+        </Button>
       </div>
 
-      {/* Calendario Semanal */}
-      <Card className="p-6 bg-white border border-border hover:border-accent/30 transition-all duration-300 shadow-sm">
-        <div className="grid grid-cols-7 gap-2">
-          {days.map((day, i) => {
-            const dayNumber = 18 + i; // Ejemplo, reemplazar con lógica real
-            const isToday = dayNumber === today;
-            const hasExam = weekExams.some((exam) => {
-              const examDay = new Date(exam.date).getDate();
-              return examDay === dayNumber;
-            });
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-5">
+              <Button variant="ghost" onClick={prevMonth}>
+                <i className="ti ti-chevron-left" />
+              </Button>
+              <h2 className="text-lg font-semibold text-foreground">
+                {MONTHS[viewingMonth]} {viewingYear}
+              </h2>
+              <Button variant="ghost" onClick={nextMonth}>
+                <i className="ti ti-chevron-right" />
+              </Button>
+            </div>
 
-            return (
-              <div key={day} className="text-center">
-                <p className="text-muted-foreground text-xs font-medium mb-2">
-                  {day}
-                </p>
-                <div
-                  className={cn(
-                    "h-10 w-10 mx-auto rounded-xl flex items-center justify-center text-sm font-medium transition-all duration-200",
-                    isToday
-                      ? "bg-accent text-accent-foreground shadow-lg shadow-accent/30 scale-105"
-                      : hasExam
-                        ? "bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20 cursor-pointer"
-                        : "bg-bg text-foreground hover:bg-accent/10 cursor-pointer",
-                  )}
-                >
-                  {dayNumber}
+            <div className="grid grid-cols-7 gap-1">
+              {DAYS.map((d) => (
+                <div key={d} className="text-center text-xs font-medium text-muted-foreground py-1">
+                  {d}
                 </div>
-                {hasExam && (
-                  <div className="mt-1 w-1.5 h-1.5 rounded-full bg-primary mx-auto" />
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </Card>
+              ))}
 
-      {/* Vista de Exámenes y Estudio */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Próximos Exámenes */}
-        <Card className="p-6 bg-white border border-border hover:border-accent/30 transition-all duration-300 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-foreground font-semibold text-base flex items-center gap-2">
-              Próximos Exámenes
-            </h2>
-            <span className="text-xs text-muted-foreground bg-bg px-2 py-1 rounded-full">
-              {EXAMS.length} total
-            </span>
-          </div>
-          <div className="space-y-3">
-            {EXAMS.map((exam) => {
-              const examDate = new Date(exam.date);
-              const daysUntil = Math.ceil(
-                (examDate.getTime() - new Date().getTime()) /
-                  (1000 * 60 * 60 * 24),
-              );
-              const isUrgent = daysUntil <= 3;
-
-              return (
-                <div
-                  key={exam.id}
-                  className={cn(
-                    "flex items-center justify-between p-3 rounded-xl border transition-all duration-200",
-                    isUrgent
-                      ? "border-red-200 bg-red-50/50 hover:bg-red-50"
-                      : "border-border hover:bg-accent/5",
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={cn(
-                        "h-2 w-2 rounded-full",
-                        PRIORITY_COLORS[exam.priority],
+              {isLoading
+                ? Array.from({ length: 35 }).map((_, i) => (
+                    <div key={i} className="aspect-square rounded-lg bg-muted animate-pulse" />
+                  ))
+                : monthError
+                  ? <div className="col-span-7 text-center py-8 text-muted-foreground text-sm">Error al cargar el mes. Intentá de nuevo.</div>
+                  : monthGrid.grid.map((day, i) => (
+                    <button
+                      key={i}
+                      onClick={() => day && handleDayClick(day.date)}
+                      className={`aspect-square rounded-lg text-xs p-1 flex flex-col items-center justify-start gap-0.5 border transition-colors
+                        ${!day ? 'invisible' : ''}
+                        ${day && isToday(day.date) ? 'border-accent bg-accent/10' : 'border-transparent hover:border-border'}
+                        ${day && selectedDateObj && day.date.toDateString() === selectedDateObj.toDateString() ? 'ring-2 ring-accent' : ''}
+                      `}
+                      disabled={!day}
+                    >
+                      <span className={`font-medium mt-1 ${day && isToday(day.date) ? 'text-accent' : 'text-foreground'}`}>
+                        {day ? day.date.getDate() : ''}
+                      </span>
+                      {day && day.schedules.length > 0 && (
+                        <div className="flex gap-0.5 flex-wrap justify-center">
+                          {day.schedules.slice(0, 3).map((s) => (
+                            <div
+                              key={s.id}
+                              className="w-1.5 h-1.5 rounded-full"
+                              style={{ backgroundColor: courseColorMap.get(s.courseName) ?? '#888' }}
+                            />
+                          ))}
+                          {day.schedules.length > 3 && (
+                            <span className="text-[9px] text-muted-foreground">+{day.schedules.length - 3}</span>
+                          )}
+                        </div>
                       )}
-                    />
-                    <div>
-                      <p className="text-foreground text-sm font-medium">
-                        {exam.course}
-                      </p>
-                      <p className="text-muted-foreground text-xs">
-                        {exam.topic}
-                      </p>
+                    </button>
+                  ))}
+            </div>
+          </Card>
+        </div>
+
+        <div>
+          <Card className="p-5">
+            <h3 className="text-sm font-semibold text-foreground mb-4">
+              {selectedDate ? formatDate(selectedDate + 'T00:00:00') : 'Selecciona un día'}
+            </h3>
+
+            {dayLoading ? (
+              <div className="space-y-3">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-16 rounded-xl bg-muted animate-pulse" />
+                ))}
+              </div>
+            ) : dayError ? (
+              <p className="text-destructive text-sm">Error al cargar horarios del día.</p>
+            ) : !selectedDate ? (
+              <p className="text-muted-foreground text-sm">Haz clic en un día del calendario para ver los horarios.</p>
+            ) : daySchedules && daySchedules.length > 0 ? (
+              <div className="space-y-2">
+                {daySchedules.map((sched) => (
+                  <div key={sched.id} className="rounded-xl border border-border p-3 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className={`text-sm font-medium ${sched.isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                        {sched.title}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {formatTime(sched.startDateTime)} – {formatTime(sched.endDateTime)}
+                    </p>
+                    {sched.courseName && (
+                      <Badge variant="secondary" className="text-[10px] flex items-center gap-1">
+                        <span
+                          className="w-1.5 h-1.5 rounded-full inline-block"
+                          style={{ backgroundColor: courseColorMap.get(sched.courseName) ?? '#888' }}
+                        />
+                        {sched.courseName}
+                      </Badge>
+                    )}
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        onClick={() => toggleComplete.mutate({ id: sched.id, completed: !sched.isCompleted })}
+                        className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {sched.isCompleted ? '↩ Reabrir' : '✓ Completar'}
+                      </button>
+                      <button
+                        onClick={() => deleteSchedule.mutate(sched.id)}
+                        className="text-xs text-destructive hover:text-destructive/80 transition-colors"
+                      >
+                        Eliminar
+                      </button>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-foreground text-sm font-mono">
-                      {exam.time}
-                    </p>
-                    <p
-                      className={cn(
-                        "text-xs",
-                        isUrgent
-                          ? "text-red-500 font-medium"
-                          : "text-muted-foreground",
-                      )}
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-sm">Sin horarios para este día.</p>
+            )}
+          </Card>
+        </div>
+      </div>
+
+      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Nuevo horario</DialogTitle>
+            <DialogDescription>Creá un bloque de estudio en tu cronograma</DialogDescription>
+          </DialogHeader>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="cursoId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Curso (opcional)</FormLabel>
+                    <Select
+                      onValueChange={(v) => { field.onChange(v); onCourseSelect(v) }}
+                      value={field.value}
                     >
-                      {daysUntil === 0
-                        ? "Hoy"
-                        : daysUntil === 1
-                          ? "Mañana"
-                          : `en ${daysUntil} días`}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccioná un curso" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {courses?.filter((c) => !c.isArchived).map((course) => (
+                          <SelectItem key={course.id} value={String(course.id)}>
+                            <div className="flex items-center gap-2">
+                              <div className="h-2 w-2 rounded-full" style={{ backgroundColor: course.colorHex }} />
+                              {course.name}
+                              {course.examDate && (() => { try { return ` (${new Date(course.examDate).toLocaleDateString()})` } catch { return '' } })()}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        {/* Estudio Diario */}
-        <Card className="p-6 bg-white border border-border hover:border-accent/30 transition-all duration-300 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-foreground font-semibold text-base flex items-center gap-2">
-              📚 Estudio de hoy
-            </h2>
-            <span className="text-xs text-muted-foreground bg-bg px-2 py-1 rounded-full">
-              {DAILY_STUDY.length} bloques
-            </span>
-          </div>
-          <div className="space-y-2">
-            {DAILY_STUDY.map((item, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-bg border border-border hover:border-accent/30 transition-all duration-200"
-              >
-                <div className="h-2 w-2 rounded-full bg-accent flex-shrink-0" />
-                <span className="text-foreground text-sm font-mono">
-                  {item.time}
-                </span>
-                <span className="text-foreground text-sm">—</span>
-                <span className="text-foreground text-sm font-medium">
-                  {item.course}
-                </span>
-                <span className="text-muted-foreground text-xs hidden sm:block">
-                  {item.topic}
-                </span>
+              <FormField
+                control={form.control}
+                name="titulo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Título *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ej: Repaso de química" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="fecha"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Fecha *</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-3">
+                <FormField
+                  control={form.control}
+                  name="horaInicio"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Inicio *</FormLabel>
+                      <FormControl>
+                        <Input type="time" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="horaFin"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Fin *</FormLabel>
+                      <FormControl>
+                        <Input type="time" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
-            ))}
-          </div>
 
-          {/* Resumen rápido */}
-          <div className="mt-4 pt-4 border-t border-border">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">
-                Horas de estudio hoy:
-              </span>
-              <span className="text-foreground font-medium">5h</span>
-            </div>
-            <div className="flex items-center justify-between text-sm mt-1">
-              <span className="text-muted-foreground">Progreso semanal:</span>
-              <div className="flex items-center gap-2">
-                <div className="w-24 h-1.5 bg-bg rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-accent rounded-full"
-                    style={{ width: "60%" }}
-                  />
-                </div>
-                <span className="text-foreground font-medium">60%</span>
+              <div className="flex gap-3 pt-2">
+                <Button type="button" variant="outline" className="flex-1" onClick={() => setShowCreateModal(false)}>
+                  Cancelar
+                </Button>
+                <Button type="submit" className="flex-1" disabled={createSchedule.isPending}>
+                  {createSchedule.isPending ? 'Creando...' : 'Crear horario'}
+                </Button>
               </div>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Leyenda */}
-      <div className="flex items-center gap-4 text-xs text-muted-foreground bg-white border border-border rounded-xl px-4 py-2 shadow-sm">
-        <span>🔵 Hoy</span>
-        <span>🟢 Examen próximo</span>
-        <span className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-red-500" /> Urgente
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-yellow-500" /> Media
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-green-500" /> Baja
-        </span>
-      </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
-  );
+  )
 }

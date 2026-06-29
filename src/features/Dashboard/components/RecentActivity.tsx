@@ -1,160 +1,126 @@
-// features/dashboard/components/RecentActivity.tsx
+import { useRecentActivity } from '../hooks'
 
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Clock, FileText, Book, Layers, Pin, ArrowRight } from "lucide-react";
-
-// ─── Tipos ──────────────────────────────────────────────
-interface ActivityItem {
-  id: string;
-  description: string;
-  timeAgo: string;
-  type: "quiz" | "set" | "flashcard" | "other";
+const TYPE_ICON: Record<string, string> = {
+  quiz: '\uD83D\uDCDD',
+  flashcards: '\uD83C\uDCCF',
+  study: '\uD83D\uDCD6',
+  schedule: '\uD83D\uDCC5',
+  course: '\uD83D\uDCDA',
+  exam: '\uD83C\uDFAF',
+  achievement: '\uD83C\uDFC6',
 }
 
-// ─── Datos mock ──────────────────────────────────────────
-const ACTIVITY: ActivityItem[] = [
-  {
-    id: "1",
-    description: "Nuevo quiz generado — Quiz: La mediana",
-    timeAgo: "hace 1 día",
-    type: "quiz",
-  },
-  {
-    id: "2",
-    description: "Nuevo set creado — Arte",
-    timeAgo: "hace 1 día",
-    type: "set",
-  },
-  {
-    id: "3",
-    description: "Sesión de flashcards — Varianza y desviación estándar",
-    timeAgo: "hace 7 días",
-    type: "flashcard",
-  },
-  {
-    id: "4",
-    description: "Sesión de flashcards — Varianza y desviación estándar",
-    timeAgo: "hace 6 días",
-    type: "flashcard",
-  },
-  {
-    id: "5",
-    description: "Sesión de flashcards — Varianza y desviación estándar",
-    timeAgo: "hace 5 días",
-    type: "flashcard",
-  },
-  {
-    id: "6",
-    description: "Sesión de flashcards — Varianza y desviación estándar",
-    timeAgo: "hace 4 días",
-    type: "flashcard",
-  },
-  {
-    id: "7",
-    description: "Sesión de flashcards — Varianza y desviación estándar",
-    timeAgo: "hace 3 días",
-    type: "flashcard",
-  },
-];
+const ACTION_LABELS: Record<string, string> = {
+  'course.created': 'Creaste el curso',
+  'course.updated': 'Actualizaste el curso',
+  'course.deleted': 'Eliminaste el curso',
+  'course.archived': 'Archivaste el curso',
+  'course.restored': 'Restauraste el curso',
+  'flashcard.created': 'Creaste tarjetas en',
+  'flashcard.updated': 'Actualizaste tarjetas en',
+  'flashcard.deleted': 'Eliminaste tarjetas de',
+  'flashcard.reviewed': 'Repasaste tarjetas de',
+  'deck.created': 'Creaste el mazo',
+  'deck.updated': 'Actualizaste el mazo',
+  'deck.deleted': 'Eliminaste el mazo',
+  'quiz.created': 'Creaste el quiz',
+  'quiz.updated': 'Actualizaste el quiz',
+  'quiz.deleted': 'Eliminaste el quiz',
+  'quiz.completed': 'Completaste el quiz',
+  'quiz.started': 'Iniciaste el quiz',
+  'study.session_started': 'Iniciaste sesión de estudio en',
+  'study.session_completed': 'Completaste sesión de estudio en',
+  'schedule.created': 'Agregaste un horario',
+  'schedule.updated': 'Actualizaste un horario',
+  'schedule.deleted': 'Eliminaste un horario',
+  'schedule.completed': 'Completaste un horario',
+  'exam.created': 'Registraste examen de',
+  'exam.updated': 'Actualizaste examen de',
+  'exam.deleted': 'Eliminaste examen de',
+  'file.uploaded': 'Subiste un archivo a',
+  'file.processed': 'Procesaste un archivo de',
+  'ai.generated': 'Generaste contenido con IA para',
+  'user.registered': 'Te registraste en Planoria',
+  'user.login': 'Iniciaste sesión',
+  'user.logout': 'Cerraste sesión',
+  'achievement.unlocked': 'Desbloqueaste el logro',
+  'goal.created': 'Estableciste una meta',
+  'goal.updated': 'Actualizaste una meta',
+  'goal.completed': 'Completaste una meta',
+}
 
-// ─── Configuración de tipos ─────────────────────────────
-const TYPE_CONFIG: Record<
-  ActivityItem["type"],
-  { icon: React.ReactNode; iconBg: string; iconColor: string }
-> = {
-  quiz: {
-    icon: <FileText className="h-4 w-4" />,
-    iconBg: "bg-primary/10",
-    iconColor: "text-primary",
-  },
-  set: {
-    icon: <Book className="h-4 w-4" />,
-    iconBg: "bg-secondary/10",
-    iconColor: "text-secondary",
-  },
-  flashcard: {
-    icon: <Layers className="h-4 w-4" />,
-    iconBg: "bg-accent/10",
-    iconColor: "text-accent",
-  },
-  other: {
-    icon: <Pin className="h-4 w-4" />,
-    iconBg: "bg-muted/10",
-    iconColor: "text-muted-foreground",
-  },
-};
+function translateAction(action: string, title: string): string {
+  const label = ACTION_LABELS[action]
+  if (label) return `${label} ${title}`
+  if (action) return `${action.replace(/\./g, ' ')} ${title}`
+  return title
+}
 
-// ─── Componente ──────────────────────────────────────────
 export function RecentActivity() {
+  const { data: activities, isLoading } = useRecentActivity(10)
+
+  if (isLoading) {
+    return <div className="h-48 rounded-2xl bg-muted animate-pulse" />
+  }
+
+  const items = activities ?? []
+
   return (
-    <Card className="transition-all duration-300 hover:border-primary/20 hover:shadow-md">
-      {/* ─── Header ─── */}
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-base font-semibold flex items-center gap-2">
-          <Clock className="h-4 w-4 text-primary" />
-          Actividad reciente
-        </CardTitle>
-        <Badge variant="secondary" className="text-xs">
-          {ACTIVITY.length}
-        </Badge>
-      </CardHeader>
+    <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+      <h2 className="text-foreground font-semibold text-base">
+        Actividad reciente
+      </h2>
 
-      {/* ─── Lista de actividades ─── */}
-      <CardContent className="space-y-1">
-        {ACTIVITY.map((item, index) => {
-          const config = TYPE_CONFIG[item.type];
-          return (
-            <div key={item.id}>
-              <div className="group flex items-center justify-between gap-3 py-2.5 px-2 -mx-2 rounded-lg transition-all duration-200 hover:bg-muted/50 cursor-default">
-                {/* ─── Icono y descripción ─── */}
-                <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                  <div
-                    className={`p-1 rounded-md shrink-0 ${config.iconBg} ${config.iconColor}`}
-                  >
-                    {config.icon}
-                  </div>
-                  <p className="text-sm truncate group-hover:text-primary transition-colors duration-200">
-                    {item.description}
+      {items.length === 0 ? (
+        <p className="text-muted-foreground text-sm">
+          Aún no hay actividad. Empieza a estudiar para ver tu progreso.
+        </p>
+      ) : (
+        <div className="space-y-1">
+          {items.map((item, i) => (
+            <div
+              key={`${item.timestamp}-${i}`}
+              className="flex items-start justify-between gap-3 py-2.5 border-b border-border last:border-0"
+            >
+              <div className="flex items-start gap-2.5 min-w-0">
+                <span className="text-sm mt-0.5 shrink-0">
+                  {TYPE_ICON[item.type] ?? '\uD83D\uDCCC'}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-foreground text-sm">
+                    {translateAction(item.action, item.title)}
                   </p>
+                  {item.courseName && (
+                    <p className="text-muted-foreground text-xs mt-0.5">
+                      {item.courseName}
+                    </p>
+                  )}
                 </div>
-
-                {/* ─── Tiempo ─── */}
-                <Badge
-                  variant="outline"
-                  className="text-xs whitespace-nowrap shrink-0"
-                >
-                  {item.timeAgo}
-                </Badge>
               </div>
-              {index < ACTIVITY.length - 1 && <Separator className="my-1" />}
+              <span className="text-muted-foreground text-xs shrink-0 whitespace-nowrap">
+                {formatRelativeTime(item.timestamp)}
+              </span>
             </div>
-          );
-        })}
-      </CardContent>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
-      {/* ─── Footer ─── */}
-      <CardFooter className="border-t pt-4">
-        <Button
-          variant="link"
-          size="sm"
-          className="text-xs px-0 h-auto gap-1"
-          onClick={() => {
-            /* TODO: Ver todas las actividades */
-          }}
-        >
-          Ver todas las actividades
-          <ArrowRight className="h-3 w-3" />
-        </Button>
-      </CardFooter>
-    </Card>
-  );
+function formatRelativeTime(timestamp: string): string {
+  const now = Date.now()
+  const date = new Date(timestamp).getTime()
+  const diffMs = now - date
+  const diffMins = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMs / 3600000)
+  const diffDays = Math.floor(diffMs / 86400000)
+
+  if (diffMins < 1) return 'ahora'
+  if (diffMins < 60) return `hace ${diffMins}m`
+  if (diffHours < 24) return `hace ${diffHours}h`
+  if (diffDays < 7) return `hace ${diffDays}d`
+  return new Date(timestamp).toLocaleDateString('es-ES', {
+    day: 'numeric', month: 'short',
+  })
 }

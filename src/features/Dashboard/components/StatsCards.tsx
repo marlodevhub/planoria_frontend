@@ -1,22 +1,16 @@
-// features/dashboard/components/StatsCards.tsx
+import { useDashboardOverview } from '../hooks'
+import { Card } from '@/components/ui/card'
 
 interface StatCardProps {
-  label: string;
-  value: string;
-  subtitle: string;
-  icon: string;
-  iconColor?: string;
+  label: string
+  value: string
+  subtitle: string
+  icon: string
 }
 
-function StatCard({
-  label,
-  value,
-  subtitle,
-  icon,
-  iconColor = "text-primary",
-}: StatCardProps) {
+function StatCard({ label, value, subtitle, icon }: StatCardProps) {
   return (
-    <div className="bg-card border border-border rounded-2xl p-5 flex items-start justify-between transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+    <Card className="p-5 flex items-start justify-between">
       <div>
         <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
           {label}
@@ -25,43 +19,51 @@ function StatCard({
         <p className="text-muted-foreground text-sm mt-0.5">{subtitle}</p>
       </div>
       <div className="bg-muted border border-border rounded-xl p-2.5 text-xl">
-        <i className={`ti ${icon} ${iconColor} text-2xl`} aria-hidden="true" />
+        {icon}
       </div>
-    </div>
-  );
+    </Card>
+  )
 }
 
 export function StatsCards() {
+  const { data: overview, isLoading } = useDashboardOverview()
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-28 rounded-xl bg-muted animate-pulse" />
+        ))}
+      </div>
+    )
+  }
+
   const stats: StatCardProps[] = [
     {
-      label: "Tarjetas hoy",
-      value: "0",
-      subtitle: "estudiadas",
-      icon: "ti-cards",
-      iconColor: "text-primary", // ✅ Cambiado: accent → primary
+      label: 'Tarjetas hoy',
+      value: String(overview?.cardsReviewedToday ?? 0),
+      subtitle: 'revisadas',
+      icon: '🃏',
     },
     {
-      label: "Retención global",
-      value: "0%",
-      subtitle: "acumulada",
-      icon: "ti-brain",
-      iconColor: "text-primary", // ✅ Ya estaba bien
+      label: 'Tiempo de estudio',
+      value: `${Math.floor((overview?.totalStudyTimeToday ?? 0) / 60)}h`,
+      subtitle: 'hoy',
+      icon: '⏱',
     },
     {
-      label: "Racha",
-      value: "5 días",
-      subtitle: "consecutivos",
-      icon: "ti-flame",
-      iconColor: "text-destructive", // ✅ Ya estaba bien
+      label: 'Racha',
+      value: `${overview?.streakDays ?? 0} días`,
+      subtitle: 'consecutivos',
+      icon: '🔥',
     },
     {
-      label: "Plan semanal",
-      value: "0%",
-      subtitle: "0/10 bloques",
-      icon: "ti-calendar-stats",
-      iconColor: "text-primary", // ✅ Cambiado: secondary → primary
+      label: 'Pendientes',
+      value: String(overview?.pendingReviewsCount ?? 0),
+      subtitle: 'revisiones',
+      icon: '📋',
     },
-  ];
+  ]
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -69,5 +71,5 @@ export function StatsCards() {
         <StatCard key={stat.label} {...stat} />
       ))}
     </div>
-  );
+  )
 }

@@ -1,277 +1,233 @@
-// features/progresos/pages/ProgresosPage.tsx
+import { useMemo } from 'react'
+import { useGlobalStats } from '../hooks/useGlobalStats'
+import { useWeeklyTrend } from '../hooks/useWeeklyTrend'
+import { useFlashcardProgress } from '../hooks/useFlashcardProgress'
+import { useQuizProgress } from '../hooks/useQuizProgress'
+import { useAchievements } from '../hooks/useAchievements'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 
-import { Card } from "@/components/ui/card";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-
-// Datos de ejemplo - reemplazar con datos reales de tu API/store
-const stats = [
-  {
-    label: "Días de racha",
-    value: "12",
-    icon: "ti-flame",
-    color: "bg-orange-50 border-orange-200 text-orange-600",
-    subtitle: "+2 esta semana",
-  },
-  {
-    label: "Tarjetas hoy",
-    value: "48",
-    icon: "ti-cards",
-    color: "bg-accent/10 border-accent/20 text-accent",
-    subtitle: "+12 vs ayer",
-  },
-  {
-    label: "Quizzes completados",
-    value: "7",
-    icon: "ti-puzzle",
-    color: "bg-primary/10 border-primary/20 text-primary",
-    subtitle: "80% de acierto",
-  },
-  {
-    label: "Horas estudiadas",
-    value: "3.5",
-    icon: "ti-clock",
-    color: "bg-secondary/10 border-secondary/20 text-secondary",
-    subtitle: "+1.5h vs ayer",
-  },
-];
-
-const WEEKLY_ACTIVITY = [
-  { day: "Lun", value: 40 },
-  { day: "Mar", value: 65 },
-  { day: "Mié", value: 30 },
-  { day: "Jue", value: 80 },
-  { day: "Vie", value: 55 },
-  { day: "Sáb", value: 90 },
-  { day: "Dom", value: 45 },
-];
-
-const SUBJECTS = [
-  { name: "Matemáticas", progress: 75, color: "bg-primary", total: 120 },
-  { name: "Física", progress: 60, color: "bg-accent", total: 80 },
-  { name: "Estadística", progress: 45, color: "bg-secondary", total: 60 },
-  { name: "Historia", progress: 30, color: "bg-destructive", total: 40 },
-];
-
-const RECENT_ACHIEVEMENTS = [
-  { id: 1, title: "Racha de 7 días", icon: "ti-flame", date: "hoy" },
-  { id: 2, title: "100 tarjetas dominadas", icon: "ti-trophy", date: "ayer" },
-  { id: 3, title: "Quiz perfecto", icon: "ti-star", date: "hace 2 días" },
-];
+function StatCard({ label, value, icon, color }: { label: string; value: string; icon: string; color: string }) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl border bg-card p-5 transition-all duration-200 hover:shadow-md">
+      <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full opacity-10" style={{ backgroundColor: color }} />
+      <div className="flex items-start justify-between">
+        <div className="space-y-1">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
+          <p className="text-2xl font-bold text-foreground">{value}</p>
+        </div>
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ backgroundColor: `${color}15` }}>
+          <span className="text-lg">{icon}</span>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export function ProgresosPage() {
-  const [activeView, setActiveView] = useState<"semana" | "mes">("semana");
+  const { data: globalStats, isLoading: statsLoading } = useGlobalStats()
+  const { data: weeklyTrend, isLoading: trendLoading } = useWeeklyTrend()
+  const { data: flashcardProgress, isLoading: flashcardLoading } = useFlashcardProgress()
+  const { data: quizProgress, isLoading: quizLoading } = useQuizProgress()
+  const { data: achievements, isLoading: achLoading } = useAchievements()
 
-  const maxValue = Math.max(...WEEKLY_ACTIVITY.map((d) => d.value));
+  const statsCards = useMemo(() => [
+    { label: 'Horas de estudio', value: String(globalStats?.totalStudyHours ?? 0), icon: '⏱', color: '#6366f1' },
+    { label: 'Tarjetas revisadas', value: String(globalStats?.totalCardsReviewed ?? 0), icon: '🃏', color: '#8b5cf6' },
+    { label: 'Quizzes completados', value: String(globalStats?.totalQuizzesCompleted ?? 0), icon: '📝', color: '#06b6d4' },
+    { label: 'Retención promedio', value: `${globalStats?.averageRetention ?? 0}%`, icon: '🧠', color: '#10b981' },
+    { label: 'Racha', value: `${globalStats?.streakDays ?? 0} días`, icon: '🔥', color: '#f59e0b' },
+    { label: 'Cursos inscritos', value: String(globalStats?.coursesEnrolled ?? 0), icon: '📚', color: '#ef4444' },
+  ], [globalStats])
 
   return (
     <div className="space-y-6 animate-fade-up">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Progreso</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Tu rendimiento de esta semana
-          </p>
-        </div>
-        <div className="flex items-center gap-2 bg-bg rounded-xl p-1 border border-border">
-          <button
-            onClick={() => setActiveView("semana")}
-            className={cn(
-              "px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200",
-              activeView === "semana"
-                ? "bg-accent text-accent-foreground shadow-sm shadow-accent/20"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            Semana
-          </button>
-          <button
-            onClick={() => setActiveView("mes")}
-            className={cn(
-              "px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200",
-              activeView === "mes"
-                ? "bg-accent text-accent-foreground shadow-sm shadow-accent/20"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            Mes
-          </button>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Progresos</h1>
+        <p className="text-muted-foreground text-sm mt-1">Estadísticas y rendimiento general</p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((s) => (
-          <Card
-            key={s.label}
-            className="p-5 bg-white border border-border hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5 transition-all duration-300"
-          >
-            <div className="flex items-start justify-between">
-              <div className={cn("rounded-xl p-2.5 text-xl border", s.color)}>
-                <i className={`ti ${s.icon} text-[20px]`} aria-hidden="true" />
-              </div>
-              <span className="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-                ↑
-              </span>
-            </div>
-            <p className="text-2xl font-bold text-foreground mt-3">{s.value}</p>
-            <p className="text-muted-foreground text-xs mt-0.5">{s.label}</p>
-            <p className="text-[10px] text-muted-foreground mt-1">
-              {s.subtitle}
-            </p>
-          </Card>
-        ))}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        {statsLoading
+          ? Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-[108px] rounded-2xl bg-muted animate-pulse" />
+            ))
+          : statsCards.map((s) => <StatCard key={s.label} {...s} />)}
       </div>
 
-      {/* Gráfico de Actividad Semanal */}
-      <Card className="p-6 bg-white border border-border hover:border-accent/30 transition-all duration-300 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-foreground flex items-center gap-2">
-            <i className="ti ti-chart-bar text-accent" aria-hidden="true" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <Card className="p-5">
+          <h2 className="text-foreground font-semibold text-base mb-4 flex items-center gap-2">
+            <i className="ti ti-calendar-stats text-[18px] text-muted-foreground" />
             Actividad semanal
-          </h3>
-          <span className="text-xs text-muted-foreground bg-bg px-2 py-1 rounded-full">
-            Total: {WEEKLY_ACTIVITY.reduce((acc, d) => acc + d.value, 0)} min
-          </span>
-        </div>
-        <div className="flex items-end gap-2 h-32">
-          {WEEKLY_ACTIVITY.map((day, i) => {
-            const height = (day.value / maxValue) * 100;
-            const isToday = i === 6;
-
-            return (
-              <div
-                key={i}
-                className="flex-1 flex flex-col items-center gap-1.5 group"
-              >
-                <div className="relative w-full flex flex-col items-center">
-                  <span className="text-[10px] text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity absolute -top-5">
-                    {day.value}
+          </h2>
+          {trendLoading ? (
+            <div className="h-40 rounded-xl bg-muted animate-pulse" />
+          ) : weeklyTrend && weeklyTrend.length > 0 ? (
+            <div className="space-y-2">
+              {weeklyTrend.map((day) => (
+                <div key={day.day} className="flex items-center gap-3">
+                  <span className="text-foreground text-sm w-16 font-medium">{day.day}</span>
+                  <div className="flex-1">
+                    <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
+                      <div
+                        className="h-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500"
+                        style={{ width: `${Math.min(100, (day.studyMinutes / 120) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                  <span className="text-muted-foreground text-xs w-12 text-right font-mono">
+                    {day.studyMinutes}m
                   </span>
-                  <div
-                    className={cn(
-                      "w-full rounded-t-lg transition-all duration-500 cursor-pointer",
-                      isToday
-                        ? "bg-accent hover:bg-accent/80"
-                        : "bg-accent/30 hover:bg-accent/60",
-                    )}
-                    style={{ height: `${height}%` }}
-                  />
                 </div>
-                <span
-                  className={cn(
-                    "text-[10px] font-mono",
-                    isToday
-                      ? "text-accent font-medium"
-                      : "text-muted-foreground",
-                  )}
-                >
-                  {day.day}
-                </span>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center mb-3">
+                <i className="ti ti-chart-bar text-lg text-muted-foreground" />
               </div>
-            );
-          })}
-        </div>
+              <p className="text-sm text-muted-foreground">No hay datos de actividad esta semana.</p>
+            </div>
+          )}
+        </Card>
+
+        <Card className="p-5">
+          <h2 className="text-foreground font-semibold text-base mb-4 flex items-center gap-2">
+            <i className="ti ti-cards text-[18px] text-muted-foreground" />
+            Progreso de Flashcards
+          </h2>
+          {flashcardLoading ? (
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-14 rounded-xl bg-muted animate-pulse" />
+              ))}
+            </div>
+          ) : flashcardProgress && flashcardProgress.length > 0 ? (
+            <div className="space-y-4">
+              {flashcardProgress.map((deck) => (
+                <div key={deck.deckId} className="space-y-1.5">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-foreground truncate">{deck.deckName}</span>
+                    <span className="text-xs font-mono text-muted-foreground">{deck.masteryPercentage}%</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                    <div
+                      className="h-2 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 transition-all duration-500"
+                      style={{ width: `${deck.masteryPercentage}%` }}
+                    />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    {deck.masteredCards}/{deck.totalCards} dominadas
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center mb-3">
+                <i className="ti ti-cards text-lg text-muted-foreground" />
+              </div>
+              <p className="text-sm text-muted-foreground">Crea y estudia flashcards para ver tu progreso.</p>
+            </div>
+          )}
+        </Card>
+      </div>
+
+      <Card className="p-5">
+        <h2 className="text-foreground font-semibold text-base mb-4 flex items-center gap-2">
+          <i className="ti ti-notes text-[18px] text-muted-foreground" />
+          Progreso de Quizzes
+        </h2>
+        {quizLoading ? (
+          <div className="space-y-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-12 rounded-xl bg-muted animate-pulse" />
+            ))}
+          </div>
+        ) : quizProgress && quizProgress.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border text-muted-foreground text-xs uppercase tracking-wider">
+                  <th className="text-left py-3 pr-4 font-medium">Quiz</th>
+                  <th className="text-center py-3 pr-4 font-medium">Intentos</th>
+                  <th className="text-center py-3 pr-4 font-medium">Mejor</th>
+                  <th className="text-center py-3 font-medium">Promedio</th>
+                </tr>
+              </thead>
+              <tbody>
+                {quizProgress.map((q) => (
+                  <tr key={q.quizId} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+                    <td className="py-3 pr-4 text-foreground font-medium">{q.quizTitle}</td>
+                    <td className="py-3 pr-4 text-center text-muted-foreground">{q.attempts}</td>
+                    <td className="py-3 pr-4 text-center">
+                      <span className={`font-semibold ${q.bestScore >= 70 ? 'text-green-600' : 'text-orange-600'}`}>
+                        {q.bestScore}%
+                      </span>
+                    </td>
+                    <td className="py-3 text-center text-muted-foreground">{q.averageScore}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center mb-3">
+              <i className="ti ti-notes text-lg text-muted-foreground" />
+            </div>
+            <p className="text-sm text-muted-foreground">Completa quizzes para ver tu progreso.</p>
+          </div>
+        )}
       </Card>
 
-      {/* Progreso por Materia y Logros */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Progreso por Materia */}
-        <Card className="p-6 bg-white border border-border hover:border-accent/30 transition-all duration-300 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-foreground flex items-center gap-2">
-              <i className="ti ti-book text-accent" aria-hidden="true" />
-              Progreso por materia
-            </h3>
-            <span className="text-xs text-muted-foreground bg-bg px-2 py-1 rounded-full">
-              {SUBJECTS.length} materias
-            </span>
-          </div>
-          <div className="space-y-4">
-            {SUBJECTS.map((subject) => (
-              <div key={subject.name} className="space-y-1.5 group">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-foreground group-hover:text-accent transition-colors">
-                    {subject.name}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground text-xs">
-                      {subject.progress}% ({subject.total} tarjetas)
-                    </span>
-                    <span className="text-foreground font-medium text-xs">
-                      {Math.round((subject.progress / 100) * subject.total)}
-                    </span>
-                  </div>
-                </div>
-                <div className="w-full bg-bg rounded-full h-2 overflow-hidden">
-                  <div
-                    className={cn(
-                      "h-2 rounded-full transition-all duration-700",
-                      subject.color,
-                    )}
-                    style={{ width: `${subject.progress}%` }}
-                  />
-                </div>
-              </div>
+      <Card className="p-5">
+        <h2 className="text-foreground font-semibold text-base mb-4 flex items-center gap-2">
+          <i className="ti ti-award text-[18px] text-muted-foreground" />
+          Logros
+        </h2>
+        {achLoading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-28 rounded-2xl bg-muted animate-pulse" />
             ))}
           </div>
-        </Card>
-
-        {/* Logros Recientes */}
-        <Card className="p-6 bg-white border border-border hover:border-accent/30 transition-all duration-300 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-foreground flex items-center gap-2">
-              <i className="ti ti-trophy text-accent" aria-hidden="true" />
-              Logros recientes
-            </h3>
-            <button className="text-xs text-accent hover:text-accent/80 transition-colors flex items-center gap-1">
-              Ver todos
-              <i className="ti ti-arrow-right text-xs" aria-hidden="true" />
-            </button>
-          </div>
-          <div className="space-y-3">
-            {RECENT_ACHIEVEMENTS.map((achievement) => (
-              <div
-                key={achievement.id}
-                className="flex items-center gap-3 p-3 rounded-xl bg-bg border border-border hover:border-accent/30 transition-all duration-200 group"
+        ) : achievements && achievements.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {achievements.map((ach) => (
+              <Card
+                key={ach.id}
+                className={`p-5 flex flex-col items-center gap-2 text-center transition-all duration-200 ${
+                  ach.completado ? 'border-primary/30 bg-primary/[0.03]' : 'opacity-45 grayscale'
+                }`}
               >
-                <div className="text-xl text-accent group-hover:scale-110 transition-transform">
-                  <i className={`ti ${achievement.icon}`} aria-hidden="true" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-foreground text-sm font-medium">
-                    {achievement.title}
-                  </p>
-                  <p className="text-muted-foreground text-xs">
-                    {achievement.date}
-                  </p>
-                </div>
-                <i
-                  className="ti ti-star text-accent opacity-0 group-hover:opacity-100 transition-opacity text-sm"
-                  aria-hidden="true"
-                />
-              </div>
+                <span className="text-3xl">{ach.icono}</span>
+                <span className="text-foreground text-sm font-semibold">{ach.nombre}</span>
+                <span className="text-muted-foreground text-[11px] leading-relaxed">{ach.descripcion}</span>
+                {!ach.completado && ach.progreso > 0 && (
+                  <div className="w-full bg-muted rounded-full h-1 mt-1 overflow-hidden">
+                    <div className="bg-accent h-1 rounded-full" style={{ width: `${ach.progreso}%` }} />
+                  </div>
+                )}
+                {ach.completado && (
+                  <Badge variant="secondary" className="text-[10px] mt-1">
+                    <i className="ti ti-check text-[11px] mr-0.5" />
+                    Desbloqueado
+                  </Badge>
+                )}
+              </Card>
             ))}
           </div>
-
-          {/* Resumen rápido */}
-          <div className="mt-4 pt-4 border-t border-border">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Progreso total:</span>
-              <div className="flex items-center gap-2">
-                <div className="w-32 h-1.5 bg-bg rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-accent rounded-full"
-                    style={{ width: "52%" }}
-                  />
-                </div>
-                <span className="text-foreground font-medium">52%</span>
-              </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center mb-3">
+              <i className="ti ti-award text-lg text-muted-foreground" />
             </div>
+            <p className="text-sm text-muted-foreground">Sigue estudiando para desbloquear logros.</p>
           </div>
-        </Card>
-      </div>
+        )}
+      </Card>
     </div>
-  );
+  )
 }
