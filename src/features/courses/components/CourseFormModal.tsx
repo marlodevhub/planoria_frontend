@@ -36,10 +36,7 @@ const COLORS = [
 ];
 
 const schema = z.object({
-  name: z
-    .string()
-    .min(1, "El nombre es requerido")
-    .max(80, "Máximo 80 caracteres"),
+  name: z.string().min(1, "El nombre es requerido").max(80, "Máximo 80 caracteres"),
   description: z.string().max(300, "Máximo 300 caracteres").optional(),
   examDate: z.string().optional(),
   examTime: z.string().optional(),
@@ -50,55 +47,66 @@ type FormFields = z.infer<typeof schema>;
 
 interface CourseFormModalProps {
   course?: CourseDetail | null;
-  open: boolean; // ← nueva prop
+  open: boolean;
   onClose: () => void;
 }
 
-export function CourseFormModal({
-  course,
-  open,
-  onClose,
-}: CourseFormModalProps) {
+export function CourseFormModal({ course, open, onClose }: CourseFormModalProps) {
   const isEditing = !!course;
   const { mutate: createCourse, isPending: isCreating } = useCreateCourse();
-  const { mutate: updateCourse, isPending: isUpdating } = useUpdateCourse(
-    course?.id ?? 0,
-  );
+  const { mutate: updateCourse, isPending: isUpdating } = useUpdateCourse(course?.id ?? 0);
   const isPending = isCreating || isUpdating;
 
   const form = useForm<FormFields>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: course?.name ?? "",
-      description: course?.description ?? "",
-      examDate: course?.examDate ? course.examDate.split("T")[0] : "",
-      examTime: course?.examTime ?? "",
-      colorHex: course?.colorHex ?? COLORS[0].hex,
+      name: "",
+      description: "",
+      examDate: "",
+      examTime: "",
+      colorHex: COLORS[0].hex,
     },
   });
 
-  // Resetea el form cuando cambia el curso o se abre el modal
   useEffect(() => {
-    if (open) {
+    if (open && course) {
       form.reset({
-        name: course?.name ?? "",
-        description: course?.description ?? "",
-        examDate: course?.examDate ? course.examDate.split("T")[0] : "",
-        examTime: course?.examTime ?? "",
-        colorHex: course?.colorHex ?? COLORS[0].hex,
+        name: course.name,
+        description: course.description || "",
+        examDate: course.examDate ? course.examDate.split("T")[0] : "",
+        examTime: course.examTime || "",
+        colorHex: course.colorHex || COLORS[0].hex,
       });
     }
-  }, [open, course]);
+    if (open && !course) {
+      form.reset({
+        name: "",
+        description: "",
+        examDate: "",
+        examTime: "",
+        colorHex: COLORS[0].hex,
+      });
+    }
+  }, [open, course, form]);
 
   const selectedColor = form.watch("colorHex");
   const nameValue = form.watch("name");
+  const examDate = form.watch("examDate");
+  const examTime = form.watch("examTime");
+
+  const hasExamDate = !!(examDate || examTime);
+
+  const handleClearExamDate = () => {
+    form.setValue("examDate", "");
+    form.setValue("examTime", "");
+  };
 
   const onSubmit = (data: FormFields) => {
     const payload = {
       name: data.name,
-      description: data.description ?? "",
-      examDate: data.examDate ? new Date(data.examDate).toISOString() : "",
-      examTime: data.examTime ?? "",
+      description: data.description || null,
+      examDate: data.examDate ? new Date(data.examDate).toISOString() : null,
+      examTime: data.examTime || null,
       colorHex: data.colorHex,
     };
 
@@ -112,7 +120,6 @@ export function CourseFormModal({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md p-0 overflow-hidden gap-0">
-        {/* Preview header con color dinámico */}
         <div
           className="h-1.5 w-full transition-colors duration-300"
           style={{ backgroundColor: selectedColor }}
@@ -125,9 +132,7 @@ export function CourseFormModal({
                 className="h-3 w-3 rounded-full flex-shrink-0 transition-colors duration-300"
                 style={{ backgroundColor: selectedColor }}
               />
-              <DialogTitle>
-                {isEditing ? "Editar curso" : "Nuevo curso"}
-              </DialogTitle>
+              <DialogTitle>{isEditing ? "Editar curso" : "Nuevo curso"}</DialogTitle>
             </div>
             {nameValue && (
               <DialogDescription className="text-xs font-mono truncate pl-5">
@@ -161,9 +166,7 @@ export function CourseFormModal({
                   <FormItem>
                     <FormLabel>
                       Descripción{" "}
-                      <span className="text-muted-foreground font-normal">
-                        (opcional)
-                      </span>
+                      <span className="text-muted-foreground font-normal">(opcional)</span>
                     </FormLabel>
                     <FormControl>
                       <Textarea
@@ -178,33 +181,48 @@ export function CourseFormModal({
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-3">
-                <FormField
-                  control={form.control}
-                  name="examDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Fecha examen</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="examTime"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Hora</FormLabel>
-                      <FormControl>
-                        <Input type="time" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-3">
+                  <FormField
+                    control={form.control}
+                    name="examDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fecha examen</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="examTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Hora</FormLabel>
+                        <FormControl>
+                          <Input type="time" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {hasExamDate && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="text-destructive hover:text-destructive w-full"
+                    onClick={handleClearExamDate}
+                  >
+                    <i className="ti ti-trash text-[14px]" />
+                    Eliminar fecha de examen
+                  </Button>
+                )}
               </div>
 
               <FormField
@@ -224,15 +242,9 @@ export function CourseFormModal({
                             className="h-7 w-7 rounded-full transition-all duration-150 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                             style={{
                               backgroundColor: hex,
-                              outline:
-                                selectedColor === hex
-                                  ? `2px solid ${hex}`
-                                  : "2px solid transparent",
+                              outline: selectedColor === hex ? `2px solid ${hex}` : "2px solid transparent",
                               outlineOffset: "2px",
-                              boxShadow:
-                                selectedColor === hex
-                                  ? `0 0 0 1px ${hex}30`
-                                  : "none",
+                              boxShadow: selectedColor === hex ? `0 0 0 1px ${hex}30` : "none",
                             }}
                             aria-label={label}
                             aria-pressed={selectedColor === hex}
@@ -256,11 +268,7 @@ export function CourseFormModal({
                   Cancelar
                 </Button>
                 <Button type="submit" className="flex-1" disabled={isPending}>
-                  {isPending
-                    ? "Guardando..."
-                    : isEditing
-                      ? "Guardar cambios"
-                      : "Crear curso"}
+                  {isPending ? "Guardando..." : isEditing ? "Guardar cambios" : "Crear curso"}
                 </Button>
               </div>
             </div>

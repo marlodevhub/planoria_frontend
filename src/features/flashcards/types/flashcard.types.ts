@@ -13,6 +13,7 @@ export interface UploadFileResponse {
   uploadedAt: string;
 }
 
+
 // POST /ai/generate/flashcards
 export interface GenerateFlashcardsDto {
   fileId: number;

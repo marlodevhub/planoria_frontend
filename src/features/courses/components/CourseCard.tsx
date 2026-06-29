@@ -2,11 +2,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import type { Course } from "../types/course.types";
 import { cn } from "@/lib/utils";
+import { useArchiveCourse, useRestoreCourse } from "../hooks";
 
 interface CourseCardProps {
   course: Course;
   onOpen: (course: Course) => void;
-  onEdit: (course: Course) => void;
 }
 
 function getDaysUntilExam(examDate: string): number | null {
@@ -61,8 +61,20 @@ function ExamCountdown({ examDate }: { examDate: string }) {
   );
 }
 
-export function CourseCard({ course, onOpen, onEdit }: CourseCardProps) {
+export function CourseCard({ course, onOpen }: CourseCardProps) {
   const isArchived = course.isArchived;
+  const { mutate: archive } = useArchiveCourse();
+  const { mutate: restore } = useRestoreCourse();
+
+  const handleArchive = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    archive(course.id);
+  };
+
+  const handleRestore = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    restore(course.id);
+  };
 
   return (
     <Card
@@ -98,16 +110,23 @@ export function CourseCard({ course, onOpen, onEdit }: CourseCardProps) {
                 Archivado
               </Badge>
             )}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(course);
-              }}
-              className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-muted text-muted-foreground hover:text-foreground transition-all duration-150"
-              aria-label="Editar curso"
-            >
-              <i className="ti ti-pencil text-[14px]" />
-            </button>
+            {isArchived ? (
+              <button
+                onClick={handleRestore}
+                className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-muted text-muted-foreground hover:text-foreground transition-all duration-150"
+                aria-label="Restaurar curso"
+              >
+                <i className="ti ti-refresh text-[14px]" />
+              </button>
+            ) : (
+              <button
+                onClick={handleArchive}
+                className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-muted text-muted-foreground hover:text-foreground transition-all duration-150"
+                aria-label="Archivar curso"
+              >
+                <i className="ti ti-archive text-[14px]" />
+              </button>
+            )}
           </div>
         </div>
 

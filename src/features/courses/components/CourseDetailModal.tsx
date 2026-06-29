@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { CourseDetail } from "../types/course.types";
-import { useDeleteCourse } from "../hooks";
+import { useDeleteCourse, useArchiveCourse, useRestoreCourse } from "../hooks";
 import {
   Dialog,
   DialogContent,
@@ -13,8 +13,8 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 
 interface CourseDetailModalProps {
-  course: CourseDetail | null; // ← permite null
-  open: boolean; // ← nueva prop
+  course: CourseDetail | null;
+  open: boolean;
   onClose: () => void;
   onEdit: () => void;
 }
@@ -45,28 +45,52 @@ export function CourseDetailModal({
   onClose,
   onEdit,
 }: CourseDetailModalProps) {
-  const { mutate: deleteCourse, isPending } = useDeleteCourse();
+  const { mutate: deleteCourse, isPending: isDeleting } = useDeleteCourse();
+  const { mutate: archive } = useArchiveCourse();
+  const { mutate: restore } = useRestoreCourse();
   const [confirming, setConfirming] = useState(false);
+
+  // ✅ Resetea confirming cuando cambia el curso o se cierra el modal
+  useEffect(() => {
+    if (!open || !course) {
+      setConfirming(false);
+    }
+  }, [open, course]);
 
   const handleDelete = () => {
     if (!course) return;
-    deleteCourse(course.id, { onSuccess: onClose });
+    deleteCourse(course.id, {
+      onSuccess: () => {
+        setConfirming(false);
+        onClose();
+      }
+    });
+  };
+
+  const handleArchive = () => {
+    if (!course) return;
+    archive(course.id, { onSuccess: onClose });
+  };
+
+  const handleRestore = () => {
+    if (!course) return;
+    restore(course.id, { onSuccess: onClose });
   };
 
   const examDate = course?.examDate
     ? new Date(course.examDate).toLocaleDateString("es-PE", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      })
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    })
     : null;
 
   const daysUntil = course?.examDate
     ? Math.ceil(
-        (new Date(course.examDate).getTime() -
-          new Date().setHours(0, 0, 0, 0)) /
-          (1000 * 60 * 60 * 24),
-      )
+      (new Date(course.examDate).getTime() -
+        new Date().setHours(0, 0, 0, 0)) /
+      (1000 * 60 * 60 * 24),
+    )
     : null;
 
   return (
@@ -191,9 +215,9 @@ export function CourseDetailModal({
                       className="flex-1"
                       size="sm"
                       onClick={handleDelete}
-                      disabled={isPending}
+                      disabled={isDeleting}
                     >
-                      {isPending ? "Borrando..." : "Borrar"}
+                      {isDeleting ? "Borrando..." : "Borrar"}
                     </Button>
                   </div>
                 </div>
@@ -208,18 +232,30 @@ export function CourseDetailModal({
                   >
                     <i className="ti ti-trash text-[15px]" />
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    size="sm"
-                    onClick={onEdit}
-                  >
+                  {course.isArchived ? (
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      size="sm"
+                      onClick={handleRestore}
+                    >
+                      <i className="ti ti-refresh text-[14px]" />
+                      Restaurar
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      size="sm"
+                      onClick={handleArchive}
+                    >
+                      <i className="ti ti-archive text-[14px]" />
+                      Archivar
+                    </Button>
+                  )}
+                  <Button variant="outline" className="flex-1" size="sm" onClick={onEdit}>
                     <i className="ti ti-pencil text-[14px]" />
                     Editar
-                  </Button>
-                  <Button className="flex-1" size="sm" onClick={onEdit}>
-                    <i className="ti ti-arrow-right text-[14px]" />
-                    Abrir
                   </Button>
                 </div>
               )}

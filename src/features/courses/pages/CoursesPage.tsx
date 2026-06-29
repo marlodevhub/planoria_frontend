@@ -45,6 +45,7 @@ export function CoursesPage() {
   );
 
   const visibleCourses = tab === "active" ? activeCourses : archivedCourses;
+  const hasCourses = (courses?.length ?? 0) > 0;
 
   const openCreate = () => {
     setSelectedId(null);
@@ -82,14 +83,16 @@ export function CoursesPage() {
                 : "Tus materias y exámenes"}
           </p>
         </div>
-        <Button onClick={openCreate} size="sm">
-          <i className="ti ti-plus text-[15px]" />
-          Nuevo curso
-        </Button>
+        {hasCourses && (
+          <Button onClick={openCreate} size="sm">
+            <i className="ti ti-plus text-[15px]" />
+            Nuevo curso
+          </Button>
+        )}
       </div>
 
-      {/* Tabs (solo si hay archivados) */}
-      {!isLoading && !!archivedCourses.length && (
+      {/* Tabs (siempre visibles) */}
+      {!isLoading && (
         <Tabs value={tab} onValueChange={(v) => setTab(v as Tab)}>
           <TabsList className="h-8">
             <TabsTrigger value="active" className="text-xs px-3 h-6">
@@ -102,9 +105,11 @@ export function CoursesPage() {
             </TabsTrigger>
             <TabsTrigger value="archived" className="text-xs px-3 h-6">
               Archivados
-              <span className="ml-1.5 text-[10px] font-mono bg-muted-foreground/15 rounded px-1">
-                {archivedCourses.length}
-              </span>
+              {archivedCourses.length > 0 && (
+                <span className="ml-1.5 text-[10px] font-mono bg-muted-foreground/15 rounded px-1">
+                  {archivedCourses.length}
+                </span>
+              )}
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -154,7 +159,6 @@ export function CoursesPage() {
               key={course.id}
               course={course}
               onOpen={openDetail}
-              onEdit={openEdit}
             />
           ))}
         </div>

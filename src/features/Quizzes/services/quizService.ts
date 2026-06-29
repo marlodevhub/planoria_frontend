@@ -95,15 +95,15 @@ function mapQuizListItem(q: BackendQuizListItem): QuizListItem {
   return {
     id: q.id,
     titulo: q.title,
-    descripcion: '',
+    descripcion: 'Sin descripción',
     cursoId: 0,
-    cursoNombre: '',
+    cursoNombre: 'Curso sin nombre',
     duracionMinutos: 0,
     puntuacionTotal: q.totalQuestions,
     preguntaCount: q.totalQuestions,
     intentosRealizados: q.attemptsCount,
     mejorPuntuacion: Math.round(q.bestScore ?? 0),
-    fechaCreacion: q.lastAttemptAt ?? '',
+    fechaCreacion: q.lastAttemptAt ?? new Date().toISOString(),
     activo: true,
   }
 }
