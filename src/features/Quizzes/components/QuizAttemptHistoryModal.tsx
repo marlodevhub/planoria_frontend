@@ -27,14 +27,14 @@ export function QuizAttemptHistoryModal({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-lg max-h-[80vh] flex flex-col p-0 gap-0">
-        <div className="px-6 pt-5 pb-3">
+        <div className="px-6 pt-5 pb-3 border-b border-border">
           <DialogHeader>
             <DialogTitle className="text-base">Historial de intentos</DialogTitle>
             <p className="text-xs text-muted-foreground mt-0.5">{quizTitle}</p>
           </DialogHeader>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-4">
+        <div className="flex-1 overflow-y-auto px-6 pb-6 pt-4 space-y-4">
           {bestLoading || historyLoading ? (
             <div className="space-y-3">
               {[1, 2].map((i) => (
@@ -76,18 +76,17 @@ export function QuizAttemptHistoryModal({
                   {history.map((attempt) => (
                     <div
                       key={attempt.id}
-                      className="flex items-center gap-3 rounded-xl border p-3"
+                      className="flex items-center gap-3 rounded-xl border border-border p-3"
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`text-sm font-semibold ${
-                              attempt.porcentaje >= 80
-                                ? "text-green-600"
-                                : attempt.porcentaje >= 50
-                                  ? "text-amber-600"
-                                  : "text-red-600"
-                            }`}
+                            className={`text-sm font-semibold ${attempt.porcentaje >= 80
+                              ? "text-green-600"
+                              : attempt.porcentaje >= 50
+                                ? "text-amber-600"
+                                : "text-red-600"
+                              }`}
                           >
                             {attempt.porcentaje}%
                           </span>

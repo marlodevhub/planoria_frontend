@@ -21,13 +21,13 @@ export function QuizPreviewModal({ quizId, quizTitle, open, onClose }: QuizPrevi
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-0 gap-0">
-        <div className="px-6 pt-5 pb-3">
+        <div className="px-6 pt-5 pb-3 border-b border-border">
           <DialogHeader>
             <DialogTitle className="text-base">Vista previa: {quizTitle}</DialogTitle>
           </DialogHeader>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-4">
+        <div className="flex-1 overflow-y-auto px-6 pb-6 pt-4 space-y-4">
           {isLoading && (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
@@ -52,7 +52,7 @@ export function QuizPreviewModal({ quizId, quizTitle, open, onClose }: QuizPrevi
               </div>
 
               {quiz.preguntas?.map((q, i) => (
-                <div key={q.id} className="rounded-xl border p-4 space-y-3">
+                <div key={q.id} className="rounded-xl border border-border p-4 space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-sm font-medium text-foreground">
                       <span className="text-muted-foreground font-mono mr-2">{i + 1}.</span>
@@ -66,11 +66,10 @@ export function QuizPreviewModal({ quizId, quizTitle, open, onClose }: QuizPrevi
                     {q.opciones?.map((opt) => (
                       <div
                         key={opt.id}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
-                          opt.esCorrecta
-                            ? "bg-green-500/10 border border-green-500/20 text-green-700"
-                            : "bg-muted/50 text-muted-foreground"
-                        }`}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${opt.esCorrecta
+                          ? "bg-green-500/10 border border-green-500/20 text-green-700"
+                          : "bg-muted/50 text-muted-foreground"
+                          }`}
                       >
                         {opt.esCorrecta && <i className="ti ti-check text-[13px] text-green-600" />}
                         <span>{opt.texto}</span>
@@ -83,7 +82,7 @@ export function QuizPreviewModal({ quizId, quizTitle, open, onClose }: QuizPrevi
           )}
         </div>
 
-        <div className="px-6 pb-5 pt-2">
+        <div className="px-6 pb-5 pt-2 border-t border-border">
           <Button variant="outline" className="w-full" size="sm" onClick={onClose}>
             Cerrar
           </Button>

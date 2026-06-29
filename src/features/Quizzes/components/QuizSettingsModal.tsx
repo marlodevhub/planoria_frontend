@@ -82,14 +82,14 @@ export function QuizSettingsModal({ quizId, open, onClose }: QuizSettingsModalPr
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md p-0 gap-0">
-        <div className="px-6 pt-5 pb-2">
+        <div className="px-6 pt-5 pb-3 border-b border-border">
           <DialogHeader>
             <DialogTitle className="text-base">Configuración del quiz</DialogTitle>
           </DialogHeader>
         </div>
 
         {isLoading ? (
-          <div className="px-6 pb-6 space-y-3">
+          <div className="px-6 pb-6 pt-4 space-y-3">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="h-10 rounded-xl bg-muted animate-pulse" />
             ))}
@@ -97,13 +97,13 @@ export function QuizSettingsModal({ quizId, open, onClose }: QuizSettingsModalPr
         ) : (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
-              <div className="px-6 pb-6 space-y-4">
+              <div className="px-6 pb-6 pt-4 space-y-4">
                 <FormField
                   control={form.control}
                   name="mostrarResultados"
                   render={({ field }) => (
                     <FormItem className="flex items-center justify-between">
-                      <FormLabel className="mb-0">Mostrar resultados</FormLabel>
+                      <FormLabel className="mb-0 text-sm">Mostrar resultados</FormLabel>
                       <FormControl>
                         <button
                           type="button"
@@ -124,7 +124,7 @@ export function QuizSettingsModal({ quizId, open, onClose }: QuizSettingsModalPr
                   name="permitirReintentos"
                   render={({ field }) => (
                     <FormItem className="flex items-center justify-between">
-                      <FormLabel className="mb-0">Permitir reintentos</FormLabel>
+                      <FormLabel className="mb-0 text-sm">Permitir reintentos</FormLabel>
                       <FormControl>
                         <button
                           type="button"
@@ -145,7 +145,7 @@ export function QuizSettingsModal({ quizId, open, onClose }: QuizSettingsModalPr
                   name="maxIntentos"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Máximo de intentos</FormLabel>
+                      <FormLabel className="text-sm">Máximo de intentos</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -165,7 +165,7 @@ export function QuizSettingsModal({ quizId, open, onClose }: QuizSettingsModalPr
                   name="tiempoPorPregunta"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
+                      <FormLabel className="text-sm">
                         Tiempo por pregunta (segundos){" "}
                         <span className="text-muted-foreground font-normal">(0 = sin límite)</span>
                       </FormLabel>
@@ -185,7 +185,7 @@ export function QuizSettingsModal({ quizId, open, onClose }: QuizSettingsModalPr
 
                 <Separator />
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 pt-1">
                   <Button
                     type="button"
                     variant="outline"

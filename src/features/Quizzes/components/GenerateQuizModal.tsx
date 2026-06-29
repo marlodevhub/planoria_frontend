@@ -301,7 +301,7 @@ export function GenerateQuizModal({ open, onClose }: GenerateQuizModalProps) {
                 />
               </div>
 
-              <div className="px-6 pb-6 flex gap-3">
+              <div className="px-6 pb-6 flex gap-3 border-t border-border pt-4">
                 <Button type="button" variant="outline" className="flex-1" onClick={handleClose}>
                   Cancelar
                 </Button>
@@ -420,7 +420,7 @@ export function GenerateQuizModal({ open, onClose }: GenerateQuizModalProps) {
                 />
               </div>
 
-              <div className="px-6 pb-6 flex gap-3">
+              <div className="px-6 pb-6 flex gap-3 border-t border-border pt-4">
                 <Button
                   type="button"
                   variant="outline"

@@ -7,12 +7,17 @@ import { useDayView } from '../hooks/useDayView'
 import { useCreateSchedule } from '../hooks/useCreateSchedule'
 import { useToggleComplete } from '../hooks/useToggleComplete'
 import { useDeleteSchedule } from '../hooks/useDeleteSchedule'
+import { useScheduleContents } from '../hooks/useScheduleContents'
+import { useCreateScheduleContent } from '../hooks/useCreateScheduleContent'
+import { useDeleteScheduleContent } from '../hooks/useDeleteScheduleContent'
+import { useAutoAssignContent } from '../hooks/useAutoAssignContent'
 import { useCourses } from '@/features/courses/hooks'
+import { useDecks } from '@/features/flashcards/hooks'
+import { useQuizzes } from '@/features/quizzes/hooks'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import {
   Dialog,
   DialogContent,
@@ -52,7 +57,14 @@ const scheduleSchema = z.object({
   cursoId: z.string().default(''),
 })
 
+const contentSchema = z.object({
+  contentType: z.enum(['flashcard', 'quiz']),
+  contentId: z.string().min(1, 'Seleccioná un contenido'),
+  estimatedMinutes: z.string().optional(),
+})
+
 type ScheduleFormFields = z.infer<typeof scheduleSchema>
+type ContentFormFields = z.infer<typeof contentSchema>
 
 function formatTime(iso: string) {
   try { return new Date(iso).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) } catch { return iso }
@@ -68,10 +80,14 @@ export function CronogramaPage() {
   const [viewingMonth, setViewingMonth] = useState(today.getMonth())
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(null)
+  const [showContentModal, setShowContentModal] = useState(false)
 
   const { data: monthDays, isLoading, isError: monthError } = useMonthView(viewingYear, viewingMonth + 1)
   const { data: daySchedules, isLoading: dayLoading, isError: dayError } = useDayView(selectedDate ?? '')
   const { data: courses } = useCourses()
+  const { data: decks } = useDecks()
+  const { data: quizzes } = useQuizzes()
 
   const courseColorMap = useMemo(() => {
     const map = new Map<string, string>()
@@ -86,6 +102,20 @@ export function CronogramaPage() {
   const toggleComplete = useToggleComplete()
   const deleteSchedule = useDeleteSchedule()
   const createSchedule = useCreateSchedule()
+
+  const { data: contents } = useScheduleContents(selectedScheduleId ?? 0)
+  const createContent = useCreateScheduleContent(selectedScheduleId ?? 0)
+  const deleteContent = useDeleteScheduleContent(selectedScheduleId ?? 0)
+  const autoAssign = useAutoAssignContent(selectedScheduleId ?? 0)
+
+  const contentForm = useForm<ContentFormFields>({
+    resolver: zodResolver(contentSchema) as any,
+    defaultValues: {
+      contentType: 'flashcard',
+      contentId: '',
+      estimatedMinutes: '15',
+    },
+  })
 
   const form = useForm<ScheduleFormFields>({
     resolver: zodResolver(scheduleSchema) as any,
@@ -110,6 +140,16 @@ export function CronogramaPage() {
     form.setValue('horaInicio', '09:00')
     form.setValue('horaFin', '10:00')
     setShowCreateModal(true)
+  }
+
+  function openContentModal(scheduleId: number) {
+    setSelectedScheduleId(scheduleId)
+    contentForm.reset({
+      contentType: 'flashcard',
+      contentId: '',
+      estimatedMinutes: '15',
+    })
+    setShowContentModal(true)
   }
 
   function onCourseSelect(courseId: string) {
@@ -139,6 +179,31 @@ export function CronogramaPage() {
         },
       },
     )
+  }
+
+  function onContentSubmit(data: ContentFormFields) {
+    if (!selectedScheduleId) return
+    createContent.mutate(
+      {
+        contentType: data.contentType,
+        contentId: Number(data.contentId),
+        estimatedMinutes: Number(data.estimatedMinutes) || 15,
+      },
+      {
+        onSuccess: () => {
+          setShowContentModal(false)
+          contentForm.reset()
+        },
+      },
+    )
+  }
+
+  function handleAutoAssign() {
+    if (!selectedScheduleId) return
+    autoAssign.mutate({
+      courseId: 0,
+      daysBeforeExam: 30,
+    })
   }
 
   const selectedDateObj = selectedDate ? new Date(selectedDate + 'T00:00:00') : null
@@ -207,6 +272,9 @@ export function CronogramaPage() {
     return d.toDateString() === today.toDateString()
   }
 
+  const availableFlashcards = decks ?? []
+  const availableQuizzes = quizzes?.filter((q) => q.activo) ?? []
+
   return (
     <div className="space-y-6 animate-fade-up">
       <div className="flex items-center justify-between">
@@ -216,10 +284,6 @@ export function CronogramaPage() {
             Gestiona tus horarios de estudio
           </p>
         </div>
-        <Button onClick={() => openCreateModalWithDate(selectedDate ?? undefined)}>
-          <i className="ti ti-plus text-[16px] mr-1" />
-          Nuevo horario
-        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -246,8 +310,8 @@ export function CronogramaPage() {
 
               {isLoading
                 ? Array.from({ length: 35 }).map((_, i) => (
-                    <div key={i} className="aspect-square rounded-lg bg-muted animate-pulse" />
-                  ))
+                  <div key={i} className="aspect-square rounded-lg bg-muted animate-pulse" />
+                ))
                 : monthError
                   ? <div className="col-span-7 text-center py-8 text-muted-foreground text-sm">Error al cargar el mes. Intentá de nuevo.</div>
                   : monthGrid.grid.map((day, i) => (
@@ -286,9 +350,22 @@ export function CronogramaPage() {
 
         <div>
           <Card className="p-5">
-            <h3 className="text-sm font-semibold text-foreground mb-4">
-              {selectedDate ? formatDate(selectedDate + 'T00:00:00') : 'Selecciona un día'}
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-foreground">
+                {selectedDate ? formatDate(selectedDate + 'T00:00:00') : 'Selecciona un día'}
+              </h3>
+              {selectedDate && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 px-3 text-xs"
+                  onClick={() => openCreateModalWithDate(selectedDate)}
+                >
+                  <i className="ti ti-plus text-[12px] mr-1" />
+                  Agregar
+                </Button>
+              )}
+            </div>
 
             {dayLoading ? (
               <div className="space-y-3">
@@ -308,6 +385,14 @@ export function CronogramaPage() {
                       <span className={`text-sm font-medium ${sched.isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
                         {sched.title}
                       </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2"
+                        onClick={() => openContentModal(sched.id)}
+                      >
+                        <i className="ti ti-plus text-[12px]" />
+                      </Button>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {formatTime(sched.startDateTime)} – {formatTime(sched.endDateTime)}
@@ -339,7 +424,12 @@ export function CronogramaPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-muted-foreground text-sm">Sin horarios para este día.</p>
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <div className="h-12 w-12 rounded-2xl bg-muted flex items-center justify-center mb-3">
+                  <i className="ti ti-calendar-off text-[22px] text-muted-foreground" />
+                </div>
+                <p className="text-sm text-muted-foreground">Sin horarios para este día</p>
+              </div>
             )}
           </Card>
         </div>
@@ -449,6 +539,108 @@ export function CronogramaPage() {
                 </Button>
                 <Button type="submit" className="flex-1" disabled={createSchedule.isPending}>
                   {createSchedule.isPending ? 'Creando...' : 'Crear horario'}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showContentModal} onOpenChange={setShowContentModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Asignar contenido</DialogTitle>
+            <DialogDescription>Agregá flashcards o quizzes a este horario</DialogDescription>
+          </DialogHeader>
+
+          <div className="flex gap-2 mb-4">
+            <Button
+              size="sm"
+              variant="outline"
+              className="flex-1"
+              onClick={handleAutoAssign}
+              disabled={autoAssign.isPending}
+            >
+              <i className="ti ti-sparkles text-[14px] mr-1" />
+              Auto-asignar
+            </Button>
+          </div>
+
+          <Form {...contentForm}>
+            <form onSubmit={contentForm.handleSubmit(onContentSubmit)} className="space-y-4">
+              <FormField
+                control={contentForm.control}
+                name="contentType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de contenido</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccioná un tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="flashcard">Flashcard</SelectItem>
+                        <SelectItem value="quiz">Quiz</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={contentForm.control}
+                name="contentId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contenido</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccioná un contenido" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {contentForm.watch('contentType') === 'flashcard'
+                          ? availableFlashcards.map((f) => (
+                            <SelectItem key={f.id} value={String(f.id)}>
+                              {f.name}
+                            </SelectItem>
+                          ))
+                          : availableQuizzes.map((q) => (
+                            <SelectItem key={q.id} value={String(q.id)}>
+                              {q.titulo}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={contentForm.control}
+                name="estimatedMinutes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Minutos estimados</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="15" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex gap-3 pt-2">
+                <Button type="button" variant="outline" className="flex-1" onClick={() => setShowContentModal(false)}>
+                  Cancelar
+                </Button>
+                <Button type="submit" className="flex-1" disabled={createContent.isPending}>
+                  {createContent.isPending ? 'Asignando...' : 'Asignar'}
                 </Button>
               </div>
             </form>
