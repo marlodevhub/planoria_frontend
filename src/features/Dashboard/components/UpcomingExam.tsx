@@ -36,8 +36,19 @@ export function UpcomingExam() {
   const { data: schedules } = useQuery<ScheduleListItem[]>({
     queryKey: ['dashboard', 'schedules-range', from, to],
     queryFn: () => cronogramaService.getByDateRange(from, to),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
+    refetchInterval: 30_000,
   })
+
+  const scheduleByCourse = useMemo(() => {
+    const map = new Map<string, ScheduleListItem[]>()
+    for (const s of schedules ?? []) {
+      const existing = map.get(s.courseName) ?? []
+      existing.push(s)
+      map.set(s.courseName, existing)
+    }
+    return map
+  }, [schedules])
 
   if (deadlinesLoading || coursesLoading) {
     return <div className="h-48 rounded-2xl bg-muted animate-pulse" />
@@ -59,10 +70,14 @@ export function UpcomingExam() {
       today.setHours(0, 0, 0, 0)
       const diffTime = examDate ? examDate.getTime() - today.getTime() : 0
       const daysUntil = examDate ? Math.ceil(diffTime / (1000 * 60 * 60 * 24)) : -1
+      const courseSchedules = scheduleByCourse.get(c.name) ?? []
+      const avgProgress = courseSchedules.length > 0
+        ? Math.round(courseSchedules.reduce((sum, s) => sum + s.progressPercentage, 0) / courseSchedules.length)
+        : c.progressPercentage ?? 0
       return {
         subject: c.name,
         daysUntil,
-        retention: c.progressPercentage ?? 0,
+        retention: Math.max(c.progressPercentage ?? 0, avgProgress),
         courseName: c.name,
         urgency: daysUntil <= 3 ? 'critical' : daysUntil <= 14 ? 'warning' : 'normal',
         type: 'exam' as const,

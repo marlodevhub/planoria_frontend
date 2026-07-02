@@ -270,7 +270,7 @@ export function GenerateQuizModal({ open, onClose }: GenerateQuizModalProps) {
                                     className="h-2 w-2 rounded-full flex-shrink-0"
                                     style={{ backgroundColor: course.colorHex }}
                                   />
-                                  {course.name}
+                                  <span className="truncate">{course.name}</span>
                                 </div>
                               </SelectItem>
                             ))}

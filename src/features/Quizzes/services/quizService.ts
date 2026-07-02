@@ -94,6 +94,32 @@ interface BackendQuizResult {
   }
 }
 
+interface BackendAttemptHistory {
+  id: number
+  quizId: number
+  quizTitle: string
+  startedAt: string
+  completedAt: string | null
+  scorePercentage: number
+  passed: boolean
+  timeSpentSeconds: number
+  answersCount: number
+  correctAnswersCount: number
+}
+
+interface BackendAttemptBest {
+  id: number
+  quizId: number
+  quizTitle: string
+  startedAt: string
+  completedAt: string | null
+  scorePercentage: number
+  passed: boolean
+  timeSpentSeconds: number
+  answersCount: number
+  correctAnswersCount: number
+}
+
 function mapQuizListItem(q: BackendQuizListItem): QuizListItem {
   return {
     id: q.id,
@@ -123,6 +149,31 @@ function mapQuizDetail(q: BackendQuizDetail): QuizDetail {
     preguntas: [],
     fechaCreacion: '',
     activo: true,
+  }
+}
+
+function mapAttemptHistory(a: BackendAttemptHistory): QuizAttemptHistory {
+  return {
+    id: a.id,
+    quizId: a.quizId,
+    quizTitle: a.quizTitle,
+    puntuacion: a.correctAnswersCount,
+    puntuacionTotal: a.answersCount,
+    porcentaje: Math.round(a.scorePercentage),
+    fechaInicio: a.startedAt,
+    fechaFin: a.completedAt ?? a.startedAt,
+    completado: a.passed,
+  }
+}
+
+function mapAttemptBest(a: BackendAttemptBest): QuizAttemptBest {
+  return {
+    id: a.id,
+    quizId: a.quizId,
+    puntuacion: a.correctAnswersCount,
+    puntuacionTotal: a.answersCount,
+    porcentaje: Math.round(a.scorePercentage),
+    fechaCompletado: a.completedAt ?? a.startedAt,
   }
 }
 
@@ -334,19 +385,19 @@ export const quizService = {
   },
 
   async getAttemptHistory(quizId: number): Promise<QuizAttemptHistory[]> {
-    const { data } = await api.get<QuizAttemptHistory[]>(
+    const { data } = await api.get<BackendAttemptHistory[]>(
       QUIZ_API_ROUTES.HISTORY,
       { params: { quizId } },
     )
-    return data
+    return (data ?? []).map(mapAttemptHistory)
   },
 
   async getBestAttempt(quizId: number): Promise<QuizAttemptBest> {
-    const { data } = await api.get<QuizAttemptBest>(
+    const { data } = await api.get<BackendAttemptBest>(
       QUIZ_API_ROUTES.BEST,
       { params: { quizId } },
     )
-    return data
+    return mapAttemptBest(data)
   },
 
   async compareAttempts(ids: number[]): Promise<AttemptCompareItem[]> {

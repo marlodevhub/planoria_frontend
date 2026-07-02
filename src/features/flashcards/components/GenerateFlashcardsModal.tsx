@@ -246,7 +246,7 @@ export function GenerateFlashcardsModal({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md p-0 overflow-visible bg-white border border-border shadow-xl">
+      <DialogContent className="max-w-md p-0 overflow-x-hidden bg-white border border-border shadow-xl">
         <div className="px-6 pt-5 pb-4 border-b border-border">
           <DialogHeader>
             <div className="flex  items-center justify-between mb-3 mr-10">
@@ -272,9 +272,8 @@ export function GenerateFlashcardsModal({
           <Form {...form1}>
             <form
               onSubmit={form1.handleSubmit(onStep1Submit)}
-              className="overflow-visible"
             >
-              <div className=" px-6  py-4 space-y-4 max-h-[60vh] overflow-y-auto">
+              <div className="px-6 py-4 space-y-4 max-h-[60vh] overflow-y-auto">
                 <FormField
                   control={form1.control}
                   name="courseId"
@@ -305,7 +304,7 @@ export function GenerateFlashcardsModal({
                                     className="h-2 w-2 rounded-full flex-shrink-0"
                                     style={{ backgroundColor: course.colorHex }}
                                   />
-                                  {course.name}
+                                  <span className="truncate">{course.name}</span>
                                 </div>
                               </SelectItem>
                             ))}
@@ -367,7 +366,6 @@ export function GenerateFlashcardsModal({
           <Form {...form2}>
             <form
               onSubmit={form2.handleSubmit(onStep2Submit)}
-              className="overflow-visible"
             >
               <div className="px-6 py-4 space-y-4 max-h-[60vh] overflow-y-auto">
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-bg/50 border border-border">
