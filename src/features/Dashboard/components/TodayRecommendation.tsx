@@ -21,7 +21,6 @@ export function TodayRecommendation() {
   } else if (activeCourses.length > 0) {
     recommendation = 'Sigue estudiando tus cursos activos. Revisa las tarjetas pendientes y practica con quizzes.'
   }
-
   return (
     <div className="bg-card border border-border rounded-2xl p-6 h-full flex flex-col gap-4">
       <div className="flex items-start gap-4">

@@ -9,6 +9,7 @@ function formatStudyTime(minutes: number): string {
   return `${h}h ${m}m`
 }
 
+
 interface StatCardProps {
   label: string
   value: string

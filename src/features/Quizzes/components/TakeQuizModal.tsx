@@ -102,6 +102,7 @@ export function TakeQuizModal({ quiz, onClose }: TakeQuizModalProps) {
 
   handleSubmitRef.current = handleSubmit
 
+
   const answeredCount = Object.keys(answers).length
   const currentQuestion = questions[currentIndex]
 

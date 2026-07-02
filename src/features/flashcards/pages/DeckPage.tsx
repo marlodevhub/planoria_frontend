@@ -59,7 +59,7 @@ function FlashcardItem({ card, index }: { card: Flashcard; index: number }) {
 
       {/* Contenido */}
       <p
-        className={`text-sm leading-relaxed flex-1 transition-all duration-200 ${flipped ? "text-primary font-medium" : "text-foreground"}`}
+        className={`text-sm leading-relaxed flex-1 transition-all duration-200 break-words ${flipped ? "text-primary font-medium" : "text-foreground"}`}
       >
         {flipped ? card.answer : card.question}
       </p>

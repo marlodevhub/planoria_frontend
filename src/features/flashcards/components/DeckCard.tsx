@@ -10,7 +10,7 @@ export function DeckCard({ deck, onStudy }: DeckCardProps) {
   return (
     <Card
       onClick={() => onStudy(deck)}
-      className="relative cursor-pointer transition-all duration-200 group p-0 overflow-hidden hover:shadow-md hover:-translate-y-px"
+      className="relative cursor-pointer transition-all duration-200 group p-0 overflow-hidden min-w-0 hover:shadow-md hover:-translate-y-px"
     >
       <div
         className="absolute left-0 top-0 bottom-0 w-[3px]"
@@ -28,14 +28,14 @@ export function DeckCard({ deck, onStudy }: DeckCardProps) {
             <p className="font-semibold text-foreground text-sm leading-tight truncate">
               {deck.name}
             </p>
-            <p className="text-muted-foreground text-[11px] mt-0.5">
+            <p className="text-muted-foreground text-[11px] mt-0.5 truncate">
               {deck.courseName}
             </p>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-center gap-3 mb-3 flex-wrap">
           <span className="text-[11px] font-mono text-muted-foreground">
             {deck.totalCards} tarjetas
           </span>

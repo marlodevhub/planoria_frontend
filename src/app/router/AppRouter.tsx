@@ -39,7 +39,7 @@ export function AppRouter() {
             <Route path={ROUTES.CRONOGRAMA} element={<CronogramaPage />} />
             <Route path={ROUTES.PROGRESO} element={<ProgresosPage />} />
             <Route path={ROUTES.CURSOS} element={<CoursesPage />} />
-            <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+<Route path={ROUTES.PROFILE} element={<ProfilePage />} />
           </Route>
         </Route>
 

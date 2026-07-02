@@ -164,6 +164,7 @@ export function CronogramaPage() {
     setSelectedScheduleId(prev => prev === scheduleId ? null : scheduleId)
   }
 
+
   function onCourseSelect(courseId: string) {
     form.setValue('cursoId', courseId)
     if (!courseId) return

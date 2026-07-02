@@ -128,7 +128,7 @@ export function QuizzesPage() {
             return (
               <Card
                 key={quiz.id}
-                className="relative cursor-pointer transition-all duration-200 group p-0 overflow-hidden hover:shadow-md hover:-translate-y-px"
+                className="relative cursor-pointer transition-all duration-200 group p-0 overflow-hidden min-w-0 hover:shadow-md hover:-translate-y-px"
                 onClick={() => setSelectedQuiz(quiz)}
               >
                 <div
@@ -146,7 +146,7 @@ export function QuizzesPage() {
                         {quiz.titulo}
                       </p>
                       {quiz.cursoNombre && (
-                        <p className="text-muted-foreground text-[11px] mt-0.5">{quiz.cursoNombre}</p>
+                        <p className="text-muted-foreground text-[11px] mt-0.5 truncate">{quiz.cursoNombre}</p>
                       )}
                     </div>
                     <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
@@ -193,7 +193,7 @@ export function QuizzesPage() {
                     </div>
                   </div>
 
-                  <p className="text-muted-foreground text-xs line-clamp-2 leading-relaxed">
+                  <p className="text-muted-foreground text-xs line-clamp-2 leading-relaxed break-words">
                     {quiz.descripcion || 'Sin descripción'}
                   </p>
 

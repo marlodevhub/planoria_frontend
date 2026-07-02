@@ -44,6 +44,7 @@ export function QuizAttemptHistoryModal({
             </div>
           )}
 
+
           {bestLoading || historyLoading ? (
             <div className="space-y-3">
               {[1, 2].map((i) => (
