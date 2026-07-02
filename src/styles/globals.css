@@ -1,0 +1,169 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+@import "./animations.css";
+@import "@fontsource-variable/jetbrains-mono";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* ─── Reset global ─── */
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply font-sans;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Sora", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     🎨 TEMA CLARO
+     ═══════════════════════════════════════════════════════ */
+  :root {
+    /* ─── Fondos y texto base ─── */
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.153 0.006 107.1);
+
+    /* ─── Tarjetas ─── */
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.153 0.006 107.1);
+
+    /* ─── Popovers ─── */
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.153 0.006 107.1);
+
+    /* ─── Primario (Teal/Verde-azulado) ─── */
+    --primary: oklch(0.511 0.096 186.391);
+    --primary-foreground: oklch(0.984 0.014 180.72);
+
+    /* ─── Secundario ─── */
+    --secondary: oklch(0.967 0.001 286.375);
+    --secondary-foreground: oklch(0.21 0.006 285.885);
+
+    /* ─── Muted ─── */
+    --muted: oklch(0.966 0.005 106.5);
+    --muted-foreground: oklch(0.58 0.031 107.3);
+
+    /* ─── Acento ─── */
+    --accent: oklch(0.966 0.005 106.5);
+    --accent-foreground: oklch(0.228 0.013 107.4);
+
+    /* ─── Destructivo ─── */
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(0.985 0 0);
+
+    /* ─── Bordes e inputs ─── */
+    --border: oklch(0.93 0.007 106.5);
+    --input: oklch(0.93 0.007 106.5);
+    --ring: oklch(0.737 0.021 106.9);
+
+    /* ─── Radio ─── */
+    --radius: 0.625rem;
+
+    /* ─── Charts ─── */
+    --chart-1: oklch(0.897 0.196 126.665);
+    --chart-2: oklch(0.768 0.233 130.85);
+    --chart-3: oklch(0.648 0.2 131.684);
+    --chart-4: oklch(0.532 0.157 131.589);
+    --chart-5: oklch(0.453 0.124 130.933);
+
+    /* ─── Sidebar ─── */
+    --sidebar: oklch(0.988 0.003 106.5);
+    --sidebar-foreground: oklch(0.153 0.006 107.1);
+    --sidebar-primary: oklch(0.6 0.118 184.704);
+    --sidebar-primary-foreground: oklch(0.984 0.014 180.72);
+    --sidebar-accent: oklch(0.966 0.005 106.5);
+    --sidebar-accent-foreground: oklch(0.228 0.013 107.4);
+    --sidebar-border: oklch(0.93 0.007 106.5);
+    --sidebar-ring: oklch(0.737 0.021 106.9);
+
+    /* ─── COLORES DE ESTADO (nuevos) ─── */
+    --success: oklch(0.6 0.18 150);
+    --success-foreground: oklch(0.98 0 0);
+    --warning: oklch(0.7 0.2 80);
+    --warning-foreground: oklch(0.98 0 0);
+    --info: oklch(0.52 0.105 223.128);
+    --info-foreground: oklch(0.984 0.019 200.873);
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     🌙 TEMA OSCURO
+     ═══════════════════════════════════════════════════════ */
+  .dark {
+    /* ─── Fondos y texto base ─── */
+    --background: oklch(0.153 0.006 107.1);
+    --foreground: oklch(0.988 0.003 106.5);
+
+    /* ─── Tarjetas ─── */
+    --card: oklch(0.228 0.013 107.4);
+    --card-foreground: oklch(0.988 0.003 106.5);
+
+    /* ─── Popovers ─── */
+    --popover: oklch(0.228 0.013 107.4);
+    --popover-foreground: oklch(0.988 0.003 106.5);
+
+    /* ─── Primario (Teal/Verde-azulado más oscuro) ─── */
+    --primary: oklch(0.437 0.078 188.216);
+    --primary-foreground: oklch(0.984 0.014 180.72);
+
+    /* ─── Secundario ─── */
+    --secondary: oklch(0.274 0.006 286.033);
+    --secondary-foreground: oklch(0.985 0 0);
+
+    /* ─── Muted ─── */
+    --muted: oklch(0.286 0.016 107.4);
+    --muted-foreground: oklch(0.737 0.021 106.9);
+
+    /* ─── Acento ─── */
+    --accent: oklch(0.286 0.016 107.4);
+    --accent-foreground: oklch(0.988 0.003 106.5);
+
+    /* ─── Destructivo ─── */
+    --destructive: oklch(0.704 0.191 22.216);
+    --destructive-foreground: oklch(0.985 0 0);
+
+    /* ─── Bordes e inputs ─── */
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.58 0.031 107.3);
+
+    /* ─── Charts ─── */
+    --chart-1: oklch(0.897 0.196 126.665);
+    --chart-2: oklch(0.768 0.233 130.85);
+    --chart-3: oklch(0.648 0.2 131.684);
+    --chart-4: oklch(0.532 0.157 131.589);
+    --chart-5: oklch(0.453 0.124 130.933);
+
+    /* ─── Sidebar ─── */
+    --sidebar: oklch(0.228 0.013 107.4);
+    --sidebar-foreground: oklch(0.988 0.003 106.5);
+    --sidebar-primary: oklch(0.704 0.14 182.503);
+    --sidebar-primary-foreground: oklch(0.277 0.046 192.524);
+    --sidebar-accent: oklch(0.286 0.016 107.4);
+    --sidebar-accent-foreground: oklch(0.988 0.003 106.5);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.58 0.031 107.3);
+
+    /* ─── COLORES DE ESTADO (nuevos) ─── */
+    --success: oklch(0.65 0.18 150);
+    --success-foreground: oklch(0.98 0 0);
+    --warning: oklch(0.75 0.18 80);
+    --warning-foreground: oklch(0.98 0 0);
+    --info: oklch(0.6 0.15 230);
+    --info-foreground: oklch(0.984 0.019 200.873);
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     🎯 OVERLAY DEL DIÁLOGO
+     ═══════════════════════════════════════════════════════ */
+  [data-slot="dialog-overlay"] {
+    background-color: rgb(255 255 255 / 0.2) !important;
+    backdrop-filter: blur(8px) !important;
+  }
+}
