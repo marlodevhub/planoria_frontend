@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import './styles/globals.css'   // ← esta línea falta
+import './styles/globals.css'
 import { Providers } from './app/providers/Providers'
 import { AppRouter } from './app/router/AppRouter'
 
